@@ -7,7 +7,6 @@ import string
 
 from moviepy.editor import *
 from PIL import Image
-from moviepy.video.fx.all import crop
 
 # runs the ripper using the given clip times to generate all clips from input
 def rip_looper():
@@ -29,6 +28,7 @@ def ripper(source_name, clip_start, clip_end):
 
     clip = VideoFileClip(source_path)
     subclip = clip.subclip(clip_start, clip_end)
+    subclip = subclip.set_audio(None)
     subclip.write_videofile(clip_path)
 
 # makes random names for clips since they don't matter
