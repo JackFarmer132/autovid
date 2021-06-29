@@ -7,5 +7,7 @@ SOURCE_DIR = os.path.join(BASE_DIR, "../sources")
 CLIPS_DIR = os.path.join(BASE_DIR, "../clips")
 AUDIO_DIR = os.path.join(BASE_DIR, "../audio")
 OUTPUT_DIR = os.path.join(BASE_DIR, "../results")
+TEMP_DIR = os.path.join(BASE_DIR, "../temp")
 
 SAT_CLIP_PKL = os.path.join(PARENT_DIR, "sat_clips.pkl")
+SAT_AUD_PKL = os.path.join(PARENT_DIR, "sat_audio.pkl")

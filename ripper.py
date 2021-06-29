@@ -15,7 +15,7 @@ def rip_looper():
     for source in clip_times:
         # get list of timings for clipping
         for ct in clip_times[source]:
-            if ((ct == "VIDEO") or (ct == "AUDIO")):
+            if ((ct == "VID") or (ct == "AUD")):
                 type = ct
                 continue
             source_name = source
@@ -30,7 +30,7 @@ def ripper(source_name, clip_start, clip_end, type):
     subclip = clip.subclip(clip_start, clip_end)
 
     # if vid, save as mp4 and remove audio
-    if (type == "VIDEO"):
+    if (type == "VID"):
         # generate name of output file
         fname = file_name_generator() + ".mp4"
         clip_path = os.path.join(CLIPS_DIR, fname)
@@ -48,5 +48,3 @@ def ripper(source_name, clip_start, clip_end, type):
 # makes random names for clips since they don't matter
 def file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-
-ripper("sample1.mp4", 0, 20, "AUDIO")
