@@ -11,10 +11,10 @@ from PIL import Image
 
 # use this if you need to remake the list if clips folder is updated
 def struct_maker():
-    directories = [CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR]
-    pickle_paths = [SAT_CLIP_PKL, SAT_AUD_PKL, SAT_BCK_PKL]
+    directories = [CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DIR]
+    pickle_paths = [SAT_CLIP_PKL, SAT_AUD_PKL, SAT_BCK_PKL, SAT_THUMB_PKL]
 
-    for i in range(3):
+    for i in range(len(directories)):
         newlist = []
         directory = directories[i]
         pkl_path = pickle_paths[i]
@@ -120,10 +120,37 @@ def make_vid():
         pickle.dump(aud_list, f)
 
 
+def make_thumbnail():
+    # read in thumbnail candidates
+    with open(SAT_THUMB_PKL, 'rb') as f:
+        candidates = pickle.load(f)
+
+    # get which are used to prevent back-to-back thumbnail images
+    left_package = candidates.pop(0)
+    right_package = candidates.pop(0)
+    # get images for thumbnail
+    left_img = Image.open(left_package[1])
+    right_img = Image.open(right_package[1])
+
+    # make white background
+    background = Image.new('RGB', (960,540), color = (255, 255, 255))
+    # place the pics
+    background.paste(left_img, (0,0))
+    background.paste(right_img, (483,0))
+    background.save(os.path.join(OUTPUT_DIR, ("sat_" + file_name_generator() + ".jpg")))
+
+    # shuffle list and store again
+    random.shuffle(candidates)
+    candidates.append(left_package)
+    candidates.append(right_package)
+
+    with open(SAT_THUMB_PKL, 'wb') as f:
+        pickle.dump(candidates, f)
+
 # makes random names for clips since they don't matter
 def file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
 # struct_maker()
-make_vid()
+make_thumbnail()
