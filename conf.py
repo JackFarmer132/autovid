@@ -8,6 +8,7 @@ CLIPS_DIR = os.path.join(BASE_DIR, "../clips")
 AUDIO_DIR = os.path.join(BASE_DIR, "../audio")
 BACKGROUND_DIR = os.path.join(BASE_DIR, "../backgrounds")
 THUMBNAIL_DIR = os.path.join(BASE_DIR, "../thumbnails")
+FOOD_DIR = os.path.join(BASE_DIR, "../food")
 OUTPUT_DIR = os.path.join(BASE_DIR, "../results")
 
 SAT_CLIP_PKL = os.path.join(PARENT_DIR, "sat_clips.pkl")

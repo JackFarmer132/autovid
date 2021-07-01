@@ -10,9 +10,8 @@ from moviepy.editor import *
 from PIL import Image
 
 # use this if you need to remake the list if clips folder is updated
-def struct_maker():
-    directories = [CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DIR]
-    pickle_paths = [SAT_CLIP_PKL, SAT_AUD_PKL, SAT_BCK_PKL, SAT_THUMB_PKL]
+def struct_maker(directories=[CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DIR],
+                 pickle_paths = [SAT_CLIP_PKL, SAT_AUD_PKL, SAT_BCK_PKL, SAT_THUMB_PKL]):
 
     for i in range(len(directories)):
         newlist = []
@@ -56,7 +55,7 @@ def make_vid():
     aud_dur = 0
 
     # constructs video of at least 10 minutes
-    while (vid_dur < 600):
+    while (vid_dur < 1):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -77,7 +76,6 @@ def make_vid():
         aud_dur += aud_clip.duration
         aud_clips.append(aud_clip)
         used_aud_packages.append(clip_package)
-
 
     # get background
     random.shuffle(bck_list)
@@ -147,10 +145,56 @@ def make_thumbnail():
     with open(SAT_THUMB_PKL, 'wb') as f:
         pickle.dump(candidates, f)
 
-# makes random names for clips since they don't matter
+# makes random names for things since they don't matter
 def file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# struct_maker()
-make_thumbnail()
+# goes through the food bin and sorts new clips/audio/thumbnails into correct places
+def consume_new_resources():
+    new_clip = False
+    new_audio = False
+    new_thumbnail = False
+    directories = []
+    pickle_paths = []
+    # for each file in the food directory
+    for fname in os.listdir(FOOD_DIR):
+        # get path
+        fname_path = os.path.join(FOOD_DIR, fname)
+        # if file is video, is a new clip
+        if (".mp4" in fname):
+            new_clip = True
+            new_fname = file_name_generator() + ".mp4"
+            new_home = os.path.join(CLIPS_DIR, new_fname)
+        # if audio
+        elif (".mp3" in fname):
+            new_audio = True
+            new_fname = file_name_generator() + ".mp3"
+            new_home = os.path.join(AUDIO_DIR, new_fname)
+        # if thumbnail
+        elif (".jpg" in fname):
+            new_thumbnail = True
+            new_fname = file_name_generator() + ".jpg"
+            new_home = os.path.join(THUMBNAIL_DIR, new_fname)
+        # otherwise is unrecognised and leavve it be
+        else:
+            continue
+        # move the target file with new name and location
+        print(new_home)
+        os.rename(fname_path, new_home)
+    # update pickle lists if new things were added
+    if new_clip:
+        directories.append(CLIPS_DIR)
+        pickle_paths.append(SAT_CLIP_PKL)
+    if new_audio:
+        directories.append(AUDIO_DIR)
+        pickle_paths.append(SAT_AUD_PKL)
+    if new_thumbnail:
+        directories.append(THUMBNAIL_DIR)
+        pickle_paths.append(SAT_THUMB_PKL)
+    struct_maker(directories, pickle_paths)
+
+
+
+
+make_vid()
