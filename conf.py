@@ -17,3 +17,4 @@ SAT_BCK_PKL = os.path.join(PARENT_DIR, "sat_backgrounds.pkl")
 SAT_THUMB_PKL = os.path.join(PARENT_DIR, "sat_thumbnails.pkl")
 
 CLIENT_SECRET_FILE = os.path.join(PARENT_DIR, "client_secret.json")
+VID_NUM_FILE = os.path.join(OUTPUT_DIR, "cheating.txt")

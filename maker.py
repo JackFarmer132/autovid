@@ -98,8 +98,8 @@ def make_vid():
 
     # combine video and audio
     output_vid.audio = output_aud
-    output_name = "sat_" + file_name_generator() + ".mp4"
-    output_path = os.path.join(OUTPUT_DIR, output_name)
+    output_name = title_generator()
+    output_path = os.path.join(OUTPUT_DIR, (output_name + ".mp4"))
     output_vid.write_videofile(output_path)
 
     # update list and restore as pickle
@@ -132,7 +132,7 @@ def make_thumbnail():
     left_img = Image.open(left_package[1])
     right_img = Image.open(right_package[1])
 
-    file_path = os.path.join(OUTPUT_DIR, "sat_" + file_name_generator() + ".jpg")
+    file_path = os.path.join(OUTPUT_DIR, "sat_" + random_file_name_generator() + ".jpg")
 
     # make white background
     background = Image.new('RGB', (960,540), color = (255, 255, 255))
@@ -153,8 +153,51 @@ def make_thumbnail():
 
 
 # makes random names for things since they don't matter
-def file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
+def random_file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+# used for video titles that need to be click-baity
+def title_generator():
+    prefixes = ["Simply",
+                "Strangely",
+                "Super",
+                "Amazingly",
+                "Relaxing",
+                "Interesting",
+                "Incredibly",
+                "Extra",
+                "Crazy",
+    ]
+    suffixes = [
+        "That Will Help You Relax",
+        "That Will Help You Sleep",
+        "That Will Calm Your Nerves",
+        "That Will Help With Anxiety",
+        "That Make You Fall Asleep",
+        "That Will Relax and Calm You Before Sleep",
+        "That Get Rid Of Stress",
+        "That Will Make You Calm",
+        "To Calm Your Nerves",
+        "To Help You Sleep",
+        "To Make You Tired",
+        "To Relax In Bed",
+        "To Watch To Relax"
+        "To Fall Asleep To",
+        "To Watch Before Bed",
+        "For Relaxing At Night",
+        "For Taking A Break",
+        "For Going To Sleep",
+    ]
+
+    # get the number video this is
+    f = open(VID_NUM_FILE, "r")
+    vid_num = str(int(f.read()) + 1)
+
+    # write this back so next time it still works
+    f = open(VID_NUM_FILE, "w")
+    f.write(vid_num)
+
+    return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
 
 
 # goes through the food bin and sorts new clips/audio/thumbnails into correct places
@@ -171,17 +214,17 @@ def consume_new_resources():
         # if file is video, is a new clip
         if (".mp4" in fname):
             new_clip = True
-            new_fname = file_name_generator() + ".mp4"
+            new_fname = random_file_name_generator() + ".mp4"
             new_home = os.path.join(CLIPS_DIR, new_fname)
         # if audio
         elif (".mp3" in fname):
             new_audio = True
-            new_fname = file_name_generator() + ".mp3"
+            new_fname = random_file_name_generator() + ".mp3"
             new_home = os.path.join(AUDIO_DIR, new_fname)
         # if thumbnail
         elif (".jpg" in fname):
             new_thumbnail = True
-            new_fname = file_name_generator() + ".jpg"
+            new_fname = random_file_name_generator() + ".jpg"
             new_home = os.path.join(THUMBNAIL_DIR, new_fname)
         # otherwise is unrecognised and leavve it be
         else:
