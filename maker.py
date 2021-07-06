@@ -55,7 +55,7 @@ def make_vid():
     aud_dur = 0
 
     # constructs video of at least 10 minutes
-    while (vid_dur < 1):
+    while (vid_dur < 10):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -117,6 +117,8 @@ def make_vid():
     with open(SAT_AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
 
+    return (output_name, output_path, make_thumbnail())
+
 
 def make_thumbnail():
     # read in thumbnail candidates
@@ -130,12 +132,14 @@ def make_thumbnail():
     left_img = Image.open(left_package[1])
     right_img = Image.open(right_package[1])
 
+    file_path = os.path.join(OUTPUT_DIR, "sat_" + file_name_generator() + ".jpg")
+
     # make white background
     background = Image.new('RGB', (960,540), color = (255, 255, 255))
     # place the pics
     background.paste(left_img, (0,0))
     background.paste(right_img, (483,0))
-    background.save(os.path.join(OUTPUT_DIR, ("sat_" + file_name_generator() + ".jpg")))
+    background.save(file_path)
 
     # shuffle list and store again
     random.shuffle(candidates)
@@ -144,6 +148,9 @@ def make_thumbnail():
 
     with open(SAT_THUMB_PKL, 'wb') as f:
         pickle.dump(candidates, f)
+
+    return file_path
+
 
 # makes random names for things since they don't matter
 def file_name_generator(size=10, chars=string.ascii_uppercase + string.digits):
@@ -180,7 +187,6 @@ def consume_new_resources():
         else:
             continue
         # move the target file with new name and location
-        print(new_home)
         os.rename(fname_path, new_home)
     # update pickle lists if new things were added
     if new_clip:
@@ -193,8 +199,3 @@ def consume_new_resources():
         directories.append(THUMBNAIL_DIR)
         pickle_paths.append(SAT_THUMB_PKL)
     struct_maker(directories, pickle_paths)
-
-
-
-
-make_vid()
