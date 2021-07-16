@@ -33,6 +33,9 @@ def struct_maker(directories=[CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DI
 
 # make video with clips with target duration of 10 minutes
 def make_vid():
+    # eat anything new
+    consume_new_resources()
+
     # read in clips list
     with open(SAT_CLIP_PKL, 'rb') as f:
         vid_list = pickle.load(f)
@@ -55,7 +58,7 @@ def make_vid():
     aud_dur = 0
 
     # constructs video of at least 10 minutes
-    while (vid_dur < 10):
+    while (vid_dur < 600):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -192,10 +195,6 @@ def title_generator():
     # get the number video this is
     f = open(VID_NUM_FILE, "r")
     vid_num = str(int(f.read()) + 1)
-
-    # write this back so next time it still works
-    f = open(VID_NUM_FILE, "w")
-    f.write(vid_num)
 
     return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
 
