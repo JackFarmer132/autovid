@@ -97,6 +97,10 @@ def make_vid():
     output_aud = concatenate_audioclips(aud_clips)
     # trim audio to fit video and re-add fade-out
     output_aud = output_aud.subclip(0,vid_dur)
+    # normalize audio
+    output_aud = output_aud.audio_normalize()
+    # make a bit quieter since is pretty loud by default
+    output_aud = output_aud.volumex(0.8)
     output_aud = output_aud.audio_fadeout(7)
 
     # combine video and audio
@@ -110,8 +114,8 @@ def make_vid():
     vid_list += used_vid_packages
 
     # add audio back to list and shuffle
-    aud_list += used_aud_packages
     random.shuffle(aud_list)
+    aud_list += used_aud_packages
 
     # save with pickle
     with open(SAT_CLIP_PKL, 'wb') as f:
@@ -184,7 +188,7 @@ def title_generator():
         "To Help You Sleep",
         "To Make You Tired",
         "To Relax In Bed",
-        "To Watch To Relax"
+        "To Watch To Relax",
         "To Fall Asleep To",
         "To Watch Before Bed",
         "For Relaxing At Night",

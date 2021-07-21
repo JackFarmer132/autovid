@@ -17,13 +17,17 @@ def auto_upload():
     # needs this so can upload vids of 10 mins
     socket.setdefaulttimeout(30000)
 
-    API_NAME = "youtube"
-    API_VERSION = "v3"
-    SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-
     title, upload_vid, upload_thumbnail = make_vid()
 
+    API_NAME = "youtube"
+    API_VERSION = "v3"
+    SCOPES = ["https://www.googleapis.com/auth/youtube",
+              "https://www.googleapis.com/auth/youtube.force-ssl",
+              "https://www.googleapis.com/auth/youtubepartner"]
+
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
+
+    playlist_id = "PLxti3LVGtcTmeO6u8BVAb61vw2yYGhDF9"
 
     upload_date_time = datetime.datetime(2021, 7, 6, 15, 0, 0).isoformat() + ".000Z"
 
@@ -52,6 +56,19 @@ def auto_upload():
     service.thumbnails().set(
         videoId=response_upload.get("id"),
         media_body=MediaFileUpload(upload_thumbnail)
+    ).execute()
+
+    service.playlistItems().insert(
+        part="snippet",
+        body={
+            "snippet": {
+                "playlistId": playlist_id,
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": response_upload.get("id")
+                }
+            }
+        }
     ).execute()
 
     # if all has gone well, then update the vid number so next one is correct
