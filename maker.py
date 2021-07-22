@@ -32,20 +32,22 @@ def struct_maker(directories=[CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DI
 
 
 # make video with clips with target duration of 10 minutes
-def make_vid():
+def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
+             vid_type, clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
     # eat anything new
-    consume_new_resources()
+    consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
+                          clip_pkl, audio_pkl, thumb_pkl)
 
     # read in clips list
-    with open(SAT_CLIP_PKL, 'rb') as f:
+    with open(clip_pkl, 'rb') as f:
         vid_list = pickle.load(f)
 
     # read in audio list
-    with open(SAT_AUD_PKL, 'rb') as f:
+    with open(audio_pkl, 'rb') as f:
         aud_list = pickle.load(f)
 
     # read in background list
-    with open(SAT_BCK_PKL, 'rb') as f:
+    with open(bck_pkl, 'rb') as f:
         bck_list = pickle.load(f)
 
     # reading from head, construct video until duration is 10 minutes
@@ -118,16 +120,16 @@ def make_vid():
     aud_list += used_aud_packages
 
     # save with pickle
-    with open(SAT_CLIP_PKL, 'wb') as f:
+    with open(clip_pkl, 'wb') as f:
         pickle.dump(vid_list, f)
 
-    with open(SAT_AUD_PKL, 'wb') as f:
+    with open(audio_pkl, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (output_name, output_path, make_thumbnail())
+    return (output_name, output_path, make_thumbnail(thumb_pkl, vid_type))
 
 
-def make_thumbnail():
+def make_thumbnail(thumb_pkl, vid_type):
     # read in thumbnail candidates
     with open(SAT_THUMB_PKL, 'rb') as f:
         candidates = pickle.load(f)
@@ -139,7 +141,7 @@ def make_thumbnail():
     left_img = Image.open(left_package[1])
     right_img = Image.open(right_package[1])
 
-    file_path = os.path.join(OUTPUT_DIR, "sat_" + random_file_name_generator() + ".jpg")
+    file_path = os.path.join(OUTPUT_DIR, (vid_type + random_file_name_generator() + ".jpg"))
 
     # make white background
     background = Image.new('RGB', (960,540), color = (255, 255, 255))
@@ -153,7 +155,7 @@ def make_thumbnail():
     candidates.append(left_package)
     candidates.append(right_package)
 
-    with open(SAT_THUMB_PKL, 'wb') as f:
+    with open(thumb_pkl, 'wb') as f:
         pickle.dump(candidates, f)
 
     return file_path
@@ -204,31 +206,32 @@ def title_generator():
 
 
 # goes through the food bin and sorts new clips/audio/thumbnails into correct places
-def consume_new_resources():
+def consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
+                          clip_pkl, audio_pkl, thumb_pkl):
     new_clip = False
     new_audio = False
     new_thumbnail = False
     directories = []
     pickle_paths = []
     # for each file in the food directory
-    for fname in os.listdir(FOOD_DIR):
+    for fname in os.listdir(food_dir):
         # get path
-        fname_path = os.path.join(FOOD_DIR, fname)
+        fname_path = os.path.join(food_dir, fname)
         # if file is video, is a new clip
         if (".mp4" in fname):
             new_clip = True
             new_fname = random_file_name_generator() + ".mp4"
-            new_home = os.path.join(CLIPS_DIR, new_fname)
+            new_home = os.path.join(clips_dir, new_fname)
         # if audio
         elif (".mp3" in fname):
             new_audio = True
             new_fname = random_file_name_generator() + ".mp3"
-            new_home = os.path.join(AUDIO_DIR, new_fname)
+            new_home = os.path.join(audio_dir, new_fname)
         # if thumbnail
         elif (".jpg" in fname):
             new_thumbnail = True
             new_fname = random_file_name_generator() + ".jpg"
-            new_home = os.path.join(THUMBNAIL_DIR, new_fname)
+            new_home = os.path.join(thumbnail_dir, new_fname)
         # otherwise is unrecognised and leavve it be
         else:
             continue
@@ -236,12 +239,12 @@ def consume_new_resources():
         os.rename(fname_path, new_home)
     # update pickle lists if new things were added
     if new_clip:
-        directories.append(CLIPS_DIR)
-        pickle_paths.append(SAT_CLIP_PKL)
+        directories.append(clips_dir)
+        pickle_paths.append(clip_pkl)
     if new_audio:
-        directories.append(AUDIO_DIR)
-        pickle_paths.append(SAT_AUD_PKL)
+        directories.append(audio_dir)
+        pickle_paths.append(audio_pkl)
     if new_thumbnail:
-        directories.append(THUMBNAIL_DIR)
-        pickle_paths.append(SAT_THUMB_PKL)
+        directories.append(thumbnail_dir)
+        pickle_paths.append(thumb_pkl)
     struct_maker(directories, pickle_paths)

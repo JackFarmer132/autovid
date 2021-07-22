@@ -17,7 +17,23 @@ def auto_upload():
     # needs this so can upload vids of 10 mins
     socket.setdefaulttimeout(30000)
 
-    title, upload_vid, upload_thumbnail = make_vid()
+    # will eventually be changable for other mediums, but fixed for now
+    food_dir = SAT_FOOD_DIR
+    clips_dir = SAT_CLIPS_DIR
+    audio_dir = AUDIO_DIR
+    background_dir = SAT_BACKGROUND_DIR
+    thumbnail_dir = SAT_THUMBNAIL_DIR
+    vid_type = "sat"
+
+    clip_pkl = SAT_CLIP_PKL
+    audio_pkl = SAT_AUD_PKL
+    bck_pkl = SAT_BCK_PKL
+    thumb_pkl = SAT_THUMB_PKL
+
+    title, upload_vid, upload_thumbnail = make_vid(food_dir, clips_dir, audio_dir
+                                                   background_dir, thumbnail_dir,
+                                                   vid_type, clip_pkl, audio_pkl,
+                                                   bck_pkl, thumb_pkl)
 
     API_NAME = "youtube"
     API_VERSION = "v3"
