@@ -10,8 +10,7 @@ from moviepy.editor import *
 from PIL import Image
 
 # use this if you need to remake the list if clips folder is updated
-def struct_maker(directories=[CLIPS_DIR, AUDIO_DIR, BACKGROUND_DIR, THUMBNAIL_DIR],
-                 pickle_paths = [SAT_CLIP_PKL, SAT_AUD_PKL, SAT_BCK_PKL, SAT_THUMB_PKL]):
+def struct_maker(directories, pickle_paths):
 
     for i in range(len(directories)):
         newlist = []
@@ -60,7 +59,7 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     aud_dur = 0
 
     # constructs video of at least 10 minutes
-    while (vid_dur < 600):
+    while (vid_dur < 1):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -107,8 +106,7 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
 
     # combine video and audio
     output_vid.audio = output_aud
-    output_name = title_generator()
-    output_path = os.path.join(OUTPUT_DIR, (output_name + ".mp4"))
+    output_path = os.path.join(OUTPUT_DIR, "sat_new_vid.mp4")
     output_vid.write_videofile(output_path)
 
     # update list and restore as pickle
@@ -126,12 +124,12 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     with open(audio_pkl, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (output_name, output_path, make_thumbnail(thumb_pkl, vid_type))
+    return (title_generator(vid_type), output_path, make_thumbnail(thumb_pkl, vid_type))
 
 
 def make_thumbnail(thumb_pkl, vid_type):
     # read in thumbnail candidates
-    with open(SAT_THUMB_PKL, 'rb') as f:
+    with open(thumb_pkl, 'rb') as f:
         candidates = pickle.load(f)
 
     # get which are used to prevent back-to-back thumbnail images
@@ -141,7 +139,7 @@ def make_thumbnail(thumb_pkl, vid_type):
     left_img = Image.open(left_package[1])
     right_img = Image.open(right_package[1])
 
-    file_path = os.path.join(OUTPUT_DIR, (vid_type + random_file_name_generator() + ".jpg"))
+    file_path = os.path.join(OUTPUT_DIR, (vid_type + "_new_thumbnail.jpg"))
 
     # make white background
     background = Image.new('RGB', (960,540), color = (255, 255, 255))
@@ -166,43 +164,45 @@ def random_file_name_generator(size=10, chars=string.ascii_uppercase + string.di
     return ''.join(random.choice(chars) for _ in range(size))
 
 # used for video titles that need to be click-baity
-def title_generator():
-    prefixes = ["Simply",
-                "Strangely",
-                "Super",
-                "Amazingly",
-                "Relaxing",
-                "Interesting",
-                "Incredibly",
-                "Extra",
-                "Crazy",
-    ]
-    suffixes = [
-        "That Will Help You Relax",
-        "That Will Help You Sleep",
-        "That Will Calm Your Nerves",
-        "That Will Help With Anxiety",
-        "That Make You Fall Asleep",
-        "That Will Relax and Calm You Before Sleep",
-        "That Get Rid Of Stress",
-        "That Will Make You Calm",
-        "To Calm Your Nerves",
-        "To Help You Sleep",
-        "To Make You Tired",
-        "To Relax In Bed",
-        "To Watch To Relax",
-        "To Fall Asleep To",
-        "To Watch Before Bed",
-        "For Relaxing At Night",
-        "For Taking A Break",
-        "For Going To Sleep",
-    ]
+def title_generator(vid_type):
+    if vid_type == "sat":
+        prefixes = ["Simply",
+                    "Strangely",
+                    "Super",
+                    "Amazingly",
+                    "Relaxing",
+                    "Interesting",
+                    "Incredibly",
+                    "Extra",
+                    "Crazy",
+        ]
+        suffixes = [
+            "That Will Help You Relax",
+            "That Will Help You Sleep",
+            "That Will Calm Your Nerves",
+            "That Will Help With Anxiety",
+            "That Make You Fall Asleep",
+            "That Will Relax and Calm You Before Sleep",
+            "That Get Rid Of Stress",
+            "That Will Make You Calm",
+            "To Calm Your Nerves",
+            "To Help You Sleep",
+            "To Make You Tired",
+            "To Relax In Bed",
+            "To Watch To Relax",
+            "To Fall Asleep To",
+            "To Watch Before Bed",
+            "For Relaxing At Night",
+            "For Taking A Break",
+            "For Going To Sleep",
+        ]
 
-    # get the number video this is
-    f = open(VID_NUM_FILE, "r")
-    vid_num = str(int(f.read()) + 1)
+        # get the number video this is
+        f = open(os.path.join(OUTPUT_DIR, (vid_type + "_cheating.txt")), "r")
+        vid_num = str(int(f.read()) + 1)
 
-    return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
+        return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
+    return "SOMETHIG WENT WRONG lmao"
 
 
 # goes through the food bin and sorts new clips/audio/thumbnails into correct places
@@ -247,4 +247,5 @@ def consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
     if new_thumbnail:
         directories.append(thumbnail_dir)
         pickle_paths.append(thumb_pkl)
+
     struct_maker(directories, pickle_paths)
