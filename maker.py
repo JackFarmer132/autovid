@@ -100,13 +100,12 @@ def make_vid():
     # normalize audio
     output_aud = output_aud.audio_normalize()
     # make a bit quieter since is pretty loud by default
-    output_aud = output_aud.volumex(0.8)
+    output_aud = output_aud.volumex(0.7)
     output_aud = output_aud.audio_fadeout(7)
 
     # combine video and audio
     output_vid.audio = output_aud
-    output_name = title_generator()
-    output_path = os.path.join(OUTPUT_DIR, (output_name + ".mp4"))
+    output_path = os.path.join(OUTPUT_DIR, "sat_new_vid.mp4")
     output_vid.write_videofile(output_path)
 
     # update list and restore as pickle
@@ -124,7 +123,7 @@ def make_vid():
     with open(SAT_AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (output_name, output_path, make_thumbnail())
+    return (title_generator(), output_path, make_thumbnail())
 
 
 def make_thumbnail():
@@ -139,7 +138,7 @@ def make_thumbnail():
     left_img = Image.open(left_package[1])
     right_img = Image.open(right_package[1])
 
-    file_path = os.path.join(OUTPUT_DIR, "sat_" + random_file_name_generator() + ".jpg")
+    file_path = os.path.join(OUTPUT_DIR, "sat_new_thumbnail.jpg")
 
     # make white background
     background = Image.new('RGB', (960,540), color = (255, 255, 255))

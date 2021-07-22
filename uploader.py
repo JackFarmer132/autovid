@@ -27,7 +27,7 @@ def auto_upload():
 
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
-    playlist_id = "PLxti3LVGtcTmeO6u8BVAb61vw2yYGhDF9"
+    playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
 
     upload_date_time = datetime.datetime(2021, 7, 6, 15, 0, 0).isoformat() + ".000Z"
 
