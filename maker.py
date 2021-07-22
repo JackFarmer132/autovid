@@ -35,7 +35,8 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
              vid_type, clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
     # eat anything new
     consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
-                          clip_pkl, audio_pkl, thumb_pkl)
+                          background_dir, clip_pkl, audio_pkl, thumb_pkl,
+                          bck_pkl)
 
     # read in clips list
     with open(clip_pkl, 'rb') as f:
@@ -59,7 +60,7 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     aud_dur = 0
 
     # constructs video of at least 10 minutes
-    while (vid_dur < 1):
+    while (vid_dur < 600):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -106,7 +107,7 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
 
     # combine video and audio
     output_vid.audio = output_aud
-    output_path = os.path.join(OUTPUT_DIR, "sat_new_vid.mp4")
+    output_path = os.path.join(OUTPUT_DIR, (vid_type + "_new_vid.mp4"))
     output_vid.write_videofile(output_path)
 
     # update list and restore as pickle
@@ -202,12 +203,15 @@ def title_generator(vid_type):
         vid_num = str(int(f.read()) + 1)
 
         return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
+    elif vid_type == "ani":
+        return "generic animal vid"
     return "SOMETHIG WENT WRONG lmao"
 
 
 # goes through the food bin and sorts new clips/audio/thumbnails into correct places
 def consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
-                          clip_pkl, audio_pkl, thumb_pkl):
+                          background_dir, clip_pkl, audio_pkl, thumb_pkl,
+                          bck_pkl):
     new_clip = False
     new_audio = False
     new_thumbnail = False
@@ -247,5 +251,9 @@ def consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
     if new_thumbnail:
         directories.append(thumbnail_dir)
         pickle_paths.append(thumb_pkl)
+
+    # always reinstantiate background as could be changed, no way to distinguish
+    directories.append(background_dir)
+    pickle_paths.append(bck_pkl)
 
     struct_maker(directories, pickle_paths)
