@@ -15,56 +15,66 @@ from googleapiclient.http import MediaFileUpload
 
 
 def auto_upload():
-    # needs this so can upload vids of 10 mins
-    socket.setdefaulttimeout(30000)
+    # needs this so can upload vids of 60 mins
+    socket.setdefaulttimeout(3000000)
 
-    try:
-        vid_type = sys.argv[1]
-    except:
-        print("you forgot to choose the type, dummy")
-        sys.exit()
+    # will allow other types of videos at some point re-using this format
+    food_dir = SAT_FOOD_DIR
+    clips_dir = SAT_CLIPS_DIR
+    audio_dir = AUDIO_DIR
+    background_dir = SAT_BACKGROUND_DIR
+    thumbnail_dir = SAT_THUMBNAIL_DIR
+    clip_pkl = SAT_CLIP_PKL
+    audio_pkl = SAT_AUD_PKL
+    bck_pkl = SAT_BCK_PKL
+    thumb_pkl = SAT_THUMB_PKL
+    # configure metadata
+    description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
+    tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
 
-    # controls the type of video to be made
-    if vid_type == "sat":
-        food_dir = SAT_FOOD_DIR
-        clips_dir = SAT_CLIPS_DIR
-        audio_dir = AUDIO_DIR
-        background_dir = SAT_BACKGROUND_DIR
-        thumbnail_dir = SAT_THUMBNAIL_DIR
-        clip_pkl = SAT_CLIP_PKL
-        audio_pkl = SAT_AUD_PKL
-        bck_pkl = SAT_BCK_PKL
-        thumb_pkl = SAT_THUMB_PKL
-
-        description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nPlease leave a like and let us know what you thought of the video!"
-        tags = ["Satisfaction", "Relaxing", "Stress-Reducing"]
-        playlist_id = "PLxti3LVGtcTmeO6u8BVAb61vw2yYGhDF9"
-
-    elif vid_type == "ani":
-        food_dir = ANI_FOOD_DIR
-        clips_dir = ANI_CLIPS_DIR
-        audio_dir = AUDIO_DIR
-        background_dir = ANI_BACKGROUND_DIR
-        thumbnail_dir = ANI_THUMBNAIL_DIR
-        clip_pkl = ANI_CLIP_PKL
-        audio_pkl = ANI_AUD_PKL
-        bck_pkl = ANI_BCK_PKL
-        thumb_pkl = ANI_THUMB_PKL
-
-        description = "Welcome to Simply Satisfying! \n\nHere we post the cutest animal content out there (when not serving up the best satisfying clips!) \nPlease leave a like and let us know what you thought of the video!"
-        tags = ["Animals", "Cute", "Playing"]
-        playlist_id = "NOT REAL YET"
-
+    # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
+    if datetime.datetime.today().weekday() != 6:
+        # generate main video of 10 minutes
+        title, upload_vid, upload_thumbnail = make_vid(food_dir, clips_dir, audio_dir,
+                                                       background_dir, thumbnail_dir,
+                                                        clip_pkl, audio_pkl,
+                                                       bck_pkl, thumb_pkl, "medium")
+        # configure playlist
+        playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
+        # upload 10 minute vid
+        youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id)
+    # sunday so time for a phat hour long upload
     else:
-        print("invalid form of video requested, please try again")
-        sys.exit()
+        # TODO: fix memory issue to allow 60 min vids
+        # generate main video of 60 minutes
+        title, upload_vid, upload_thumbnail = make_vid(food_dir, clips_dir, audio_dir,
+                                                       background_dir, thumbnail_dir,
+                                                       clip_pkl, audio_pkl,
+                                                       bck_pkl, thumb_pkl, "medium")
+        # configure playlist
+        playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
+        # upload 10 minute vid
+        youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id)
+
+    # configure metadata for shorts
+    description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
+    tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
+    playlist_id = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
+    # generate 3 shorts and upload
+    for i in range(3):
+        title, upload_vid = make_short(food_dir, clips_dir, audio_dir,
+                                       background_dir, thumbnail_dir,
+                                       clip_pkl, audio_pkl, bck_pkl, thumb_pkl)
+        # upload the short
+        youtube_upload("short", title, upload_vid, None, description, tags, playlist_id)
+
+    # if upload ever fails but vid exists, uncomment this and use
+    # title = title_generator(vid_type)
+    # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+    # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
 
 
-    title, upload_vid, upload_thumbnail = make_vid(food_dir, clips_dir, audio_dir,
-                                                   background_dir, thumbnail_dir,
-                                                   vid_type, clip_pkl, audio_pkl,
-                                                   bck_pkl, thumb_pkl)
-
+def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id):
     API_NAME = "youtube"
     API_VERSION = "v3"
     SCOPES = ["https://www.googleapis.com/auth/youtube",
@@ -95,10 +105,12 @@ def auto_upload():
         media_body=media_file
     ).execute()
 
-    service.thumbnails().set(
-        videoId=response_upload.get("id"),
-        media_body=MediaFileUpload(upload_thumbnail)
-    ).execute()
+    # only needed if video is not a short
+    if upload_thumbnail:
+        service.thumbnails().set(
+            videoId=response_upload.get("id"),
+            media_body=MediaFileUpload(upload_thumbnail)
+        ).execute()
 
     service.playlistItems().insert(
         part="snippet",
@@ -113,11 +125,13 @@ def auto_upload():
         }
     ).execute()
 
-    # if all has gone well, then update the vid number so next one is correct
-    # get the number video this is
-    f = open(os.path.join(OUTPUT_DIR, (vid_type + "_cheating.txt")), "r")
-    vid_num = str(int(f.read()) + 1)
-    f = open(os.path.join(OUTPUT_DIR, (vid_type + "_cheating.txt")), "w")
-    f.write(vid_num)
+    # read in vid numbers
+    with open(SAT_VID_NUM_PKL, 'rb') as f:
+        vid_nums = pickle.load(f)
+    # increment relevant number and save back
+    vid_nums[vid_type] += 1
+    with open(SAT_VID_NUM_PKL, 'wb') as f:
+        pickle.dump(vid_nums, f)
+
 
 auto_upload()
