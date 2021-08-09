@@ -1,10 +1,12 @@
 from conf import *
 from clip_times import *
 
+import datetime
 import math
 import random
 import string
 import pickle
+from shutil import copyfile
 
 from moviepy.editor import *
 from PIL import Image
@@ -31,18 +33,12 @@ def struct_maker(directories, pickle_paths):
 
 
 # make video with clips with target duration of 10 minutes
-def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
-             clip_pkl, audio_pkl, bck_pkl, thumb_pkl, vid_type):
+def make_medium(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
+             clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
     # eat anything new
     consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
                           background_dir, clip_pkl, audio_pkl, thumb_pkl,
                           bck_pkl)
-
-    # get the vid length needed
-    if vid_type == "medium":
-        target_dur = 600
-    else:
-        target_dur = 3600
 
     # read in clips list
     with open(clip_pkl, 'rb') as f:
@@ -66,7 +62,7 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     aud_dur = 0
 
     # constructs video of at least given length
-    while (vid_dur < target_dur):
+    while (vid_dur < 600):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -98,7 +94,6 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     right_side = background_vid.set_position((1400, 0))
     output_vid = CompositeVideoClip([output_vid, left_side, right_side])
 
-
     output_vid = output_vid.fadeout(1)
 
     # make audio
@@ -116,6 +111,9 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
     output_vid.write_videofile(output_path)
 
+    # save file to hour_segments folder too
+    copyfile(output_path, os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4"))
+
     # update list and restore as pickle
     random.shuffle(vid_list)
     vid_list += used_vid_packages
@@ -130,7 +128,87 @@ def make_vid(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     with open(audio_pkl, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (title_generator(vid_type), output_path, make_thumbnail(thumb_pkl))
+    return (title_generator("medium"), output_path, make_thumbnail(thumb_pkl))
+
+
+# make video with clips with target duration of 10 minutes
+def make_long(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
+             clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
+    # eat anything new
+    consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
+                          background_dir, clip_pkl, audio_pkl, thumb_pkl,
+                          bck_pkl)
+
+    # read in clips list
+    with open(clip_pkl, 'rb') as f:
+        vid_list = pickle.load(f)
+
+    # read in audio list
+    with open(audio_pkl, 'rb') as f:
+        aud_list = pickle.load(f)
+
+    # read in background list
+    with open(bck_pkl, 'rb') as f:
+        bck_list = pickle.load(f)
+
+    # audio things
+    aud_dur = 0
+    aud_clips = []
+
+    # create hour-long video from the 6 segments
+    segments = []
+    for i in range(6):
+        segment = VideoFileClip(os.path.join(HOUR_SEGMENTS, "segment_" + str(i) + ".mp4"))
+        segments.append(segment)
+
+    # shuffle vids so not as obvious
+    random.shuffle(segments)
+
+    # add fade in to all but the first segment
+    for i in range(1,6):
+        segments[i] = segments[i].fadein(1)
+
+    # make video
+    output_vid = concatenate_videoclips(segments, method="compose")
+
+    # add background
+    random.shuffle(bck_list)
+    background_choice = bck_list[0]
+    background_vid = VideoFileClip(background_choice[1])
+    background_vid = background_vid.set_duration(output_vid.duration)
+    background_vid = background_vid.resize(newsize=output_vid.size)
+    left_side = background_vid.set_position((-1400, 0))
+    right_side = background_vid.set_position((1400, 0))
+    output_vid = CompositeVideoClip([output_vid, left_side, right_side])
+
+    output_vid = output_vid.fadeout(1)
+
+    # constructs audio backing that fits at least the vid length
+    while (aud_dur < output_vid.duration):
+        clip_package = aud_list.pop(0)
+        # generate music clip
+        aud_clip = AudioFileClip(clip_package[1])
+        aud_dur += aud_clip.duration
+        aud_clips.append(aud_clip)
+        # add package to end of list again since needs to repeat some songs
+        aud_list.append(clip_package)
+
+    # make audio
+    output_aud = concatenate_audioclips(aud_clips)
+    # trim audio to fit video and re-add fade-out
+    output_aud = output_aud.subclip(0,output_vid.duration)
+    # normalize audio
+    output_aud = output_aud.audio_normalize()
+    # make a bit quieter since is pretty loud by default
+    output_aud = output_aud.volumex(0.6)
+    output_aud = output_aud.audio_fadeout(7)
+
+    # combine video and audio
+    output_vid.audio = output_aud
+    output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+    output_vid.write_videofile(output_path)
+
+    return (title_generator("long"), output_path, make_thumbnail(thumb_pkl))
 
 
 def make_thumbnail(thumb_pkl):
