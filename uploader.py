@@ -15,20 +15,6 @@ from googleapiclient.http import MediaFileUpload
 
 
 def auto_upload():
-    # needs this so can upload vids of 60 mins
-    socket.setdefaulttimeout(999999)
-
-    # will allow other types of videos at some point re-using this format
-    food_dir = SAT_FOOD_DIR
-    clips_dir = SAT_CLIPS_DIR
-    audio_dir = AUDIO_DIR
-    background_dir = SAT_BACKGROUND_DIR
-    thumbnail_dir = SAT_THUMBNAIL_DIR
-    clip_pkl = SAT_CLIP_PKL
-    audio_pkl = SAT_AUD_PKL
-    bck_pkl = SAT_BCK_PKL
-    thumb_pkl = SAT_THUMB_PKL
-
     # configure metadata
     description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
     tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
@@ -36,10 +22,7 @@ def auto_upload():
     # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
     if datetime.datetime.today().weekday() != 6:
         # generate main video of 10 minutes
-        title, upload_vid, upload_thumbnail = make_medium(food_dir, clips_dir, audio_dir,
-                                                       background_dir, thumbnail_dir,
-                                                        clip_pkl, audio_pkl,
-                                                       bck_pkl, thumb_pkl)
+        title, upload_vid, upload_thumbnail = make_medium()
         # save file to hour_segments folder too
         copyfile(upload_vid, os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4"))
         # configure playlist
@@ -49,10 +32,7 @@ def auto_upload():
     # sunday so time for a phat hour long upload
     else:
         # generate main video of 60 minutes
-        title, upload_vid, upload_thumbnail = make_long(food_dir, clips_dir, audio_dir,
-                                                       background_dir, thumbnail_dir,
-                                                       clip_pkl, audio_pkl,
-                                                       bck_pkl, thumb_pkl)
+        title, upload_vid, upload_thumbnail = make_long()
         # configure playlist
         playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
         # upload 10 minute vid
@@ -70,9 +50,7 @@ def auto_upload():
     for i in range(5):
         # get time upload will occur (every 3 hours from now)
         time = datetime.datetime(now.year, now.month, now.day, (((now.hour + ((i+1)*2))-1)%24), 0, 0).isoformat() + ".000Z"
-        title, upload_vid = make_short(food_dir, clips_dir, audio_dir,
-                                       background_dir, thumbnail_dir,
-                                       clip_pkl, audio_pkl, bck_pkl, thumb_pkl)
+        title, upload_vid = make_short()
         # upload the short
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
 
@@ -139,11 +117,11 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
     ).execute()
 
     # read in vid numbers
-    with open(SAT_VID_NUM_PKL, 'rb') as f:
+    with open(VID_NUM_PKL, 'rb') as f:
         vid_nums = pickle.load(f)
     # increment relevant number and save back
     vid_nums[vid_type] += 1
-    with open(SAT_VID_NUM_PKL, 'wb') as f:
+    with open(VID_NUM_PKL, 'wb') as f:
         pickle.dump(vid_nums, f)
 
 
