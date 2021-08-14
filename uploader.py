@@ -40,6 +40,8 @@ def auto_upload():
                                                        background_dir, thumbnail_dir,
                                                         clip_pkl, audio_pkl,
                                                        bck_pkl, thumb_pkl)
+        # save file to hour_segments folder too
+        copyfile(upload_vid, os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4"))
         # configure playlist
         playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
         # upload 10 minute vid
@@ -57,34 +59,28 @@ def auto_upload():
         youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
 
     # configure metadata for shorts
-    description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #asmr"
+    description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
     tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr"]
     playlist_id = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
 
     # get current time for scheduling uploads
     now = datetime.datetime.now()
 
-    # generate 3 shorts and upload
-    for i in range(3):
+    # generate 5 shorts and upload
+    for i in range(5):
         # get time upload will occur (every 3 hours from now)
-        time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*3))%24), 0, 0).isoformat() + ".000Z"
+        time = datetime.datetime(now.year, now.month, now.day, (((now.hour + ((i+1)*2))-1)%24), 0, 0).isoformat() + ".000Z"
         title, upload_vid = make_short(food_dir, clips_dir, audio_dir,
                                        background_dir, thumbnail_dir,
                                        clip_pkl, audio_pkl, bck_pkl, thumb_pkl)
         # upload the short
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
 
-    # # for when there are errors...
-    # title = title_generator("medium")
-    # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-    # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
-    # description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
-    # tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
-    # playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-    # youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id)
-
 
 def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, time):
+    # needs this so can upload vids of 60 mins
+    socket.setdefaulttimeout(999999)
+
     API_NAME = "youtube"
     API_VERSION = "v3"
     SCOPES = ["https://www.googleapis.com/auth/youtube",
@@ -99,6 +95,8 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
             "title": title,
             "description": description,
             "tags": tags
+        },
+        "status": {
         },
         "notifySubscribers": True
     }
@@ -117,6 +115,8 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
         body=request_body,
         media_body=media_file
     ).execute()
+
+    time.sleep(10)
 
     # only needed if video is not a short
     if upload_thumbnail:
@@ -148,3 +148,13 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
 
 
 auto_upload()
+
+# # for when there are errors...
+# socket.setdefaulttimeout(999999)
+# title = title_generator("medium")
+# upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+# upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
+# description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
+# tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
+# playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
+# youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)

@@ -35,10 +35,10 @@ def struct_maker(directories, pickle_paths):
 # make video with clips with target duration of 10 minutes
 def make_medium(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
              clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
-    # eat anything new
-    consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
-                          background_dir, clip_pkl, audio_pkl, thumb_pkl,
-                          bck_pkl)
+    # ensure any deletions from the key directories are noted in pickle lists
+    checkPickleIntegrity(SAT_CLIPS_DIR, SAT_CLIP_PKL)
+    checkPickleIntegrity(AUDIO_DIR, SAT_AUD_PKL)
+    checkPickleIntegrity(SAT_THUMBNAIL_DIR, SAT_THUMB_PKL)
 
     # read in clips list
     with open(clip_pkl, 'rb') as f:
@@ -111,11 +111,7 @@ def make_medium(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
     output_vid.write_videofile(output_path)
 
-    # save file to hour_segments folder too
-    copyfile(output_path, os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4"))
-
-    # update list and restore as pickle
-    random.shuffle(vid_list)
+    # append used clips to list and save
     vid_list += used_vid_packages
 
     # add audio back to list
@@ -134,7 +130,11 @@ def make_medium(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
 # make video with clips with target duration of 10 minutes
 def make_long(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
              clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
-    # eat anything new
+    # ensure any deletions from the key directories are noted in pickle lists
+    checkPickleIntegrity(SAT_CLIPS_DIR, SAT_CLIP_PKL)
+    checkPickleIntegrity(AUDIO_DIR, SAT_AUD_PKL)
+    checkPickleIntegrity(SAT_THUMBNAIL_DIR, SAT_THUMB_PKL)
+    # eat anything new for the week ahead
     consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
                           background_dir, clip_pkl, audio_pkl, thumb_pkl,
                           bck_pkl)
@@ -208,6 +208,11 @@ def make_long(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
     output_vid.write_videofile(output_path)
 
+    # shuffle vid clips for following week and save
+    random.shuffle(vid_list)
+    with open(clip_pkl, 'wb') as f:
+        pickle.dump(vid_list, f)
+
     return (title_generator("long"), output_path, make_thumbnail(thumb_pkl))
 
 
@@ -246,10 +251,10 @@ def make_thumbnail(thumb_pkl):
 # make video with clips with target duration of 10 minutes
 def make_short(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
              clip_pkl, audio_pkl, bck_pkl, thumb_pkl):
-    # eat anything new
-    consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
-                          background_dir, clip_pkl, audio_pkl, thumb_pkl,
-                          bck_pkl)
+    # ensure any deletions from the key directories are noted in pickle lists
+    checkPickleIntegrity(SAT_CLIPS_DIR, SAT_CLIP_PKL)
+    checkPickleIntegrity(AUDIO_DIR, SAT_AUD_PKL)
+    checkPickleIntegrity(SAT_THUMBNAIL_DIR, SAT_THUMB_PKL)
     # read in clips list
     with open(clip_pkl, 'rb') as f:
         vid_list = pickle.load(f)
@@ -274,7 +279,7 @@ def make_short(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     # constructs shorts until over 15 seconds but under 60
     while True:
         # make video over 30 seconds
-        while (vid_dur < 30):
+        while (vid_dur < 20):
             # get front clip
             clip_package = vid_list.pop(0)
             # generate clip from package
@@ -284,7 +289,7 @@ def make_short(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
             vid_clips.append(clip)
             used_vid_packages.append(clip_package)
         # if over a minute, try again
-        if (vid_dur >= 60):
+        if (vid_dur >= 31):
             vid_dur = 0
             vid_clips = []
         # if duration is not 0, break out since successful clip
@@ -305,7 +310,7 @@ def make_short(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
 
     # trim to phone size
     output_vid = output_vid.crop(x1=656, y1=0, x2=1264, y2=1080)
-    output_vid = output_vid.fadeout(1)
+    output_vid = output_vid.fadeout(0.5)
 
     # make audio
     output_aud = concatenate_audioclips(aud_clips)
@@ -315,15 +320,14 @@ def make_short(food_dir, clips_dir, audio_dir, background_dir, thumbnail_dir,
     output_aud = output_aud.audio_normalize()
     # make a bit quieter since is pretty loud by default
     output_aud = output_aud.volumex(0.6)
-    output_aud = output_aud.audio_fadeout(7)
+    output_aud = output_aud.audio_fadeout(3)
 
     # combine video and audio
     output_vid.audio = output_aud
     output_path = os.path.join(OUTPUT_DIR, "new_short.mp4")
     output_vid.write_videofile(output_path)
 
-    # update list and restore as pickle
-    random.shuffle(vid_list)
+    # append used clips to list and save
     vid_list += used_vid_packages
 
     # add audio back to list
@@ -443,3 +447,24 @@ def consume_new_resources(food_dir, clips_dir, audio_dir, thumbnail_dir,
     pickle_paths.append(bck_pkl)
 
     struct_maker(directories, pickle_paths)
+
+
+def checkPickleIntegrity(directory, pkl_path):
+    # get the two lists for comparison
+    with open(pkl_path, 'rb') as f:
+        pkl_list = pickle.load(f)
+    directory_list = os.listdir(directory)
+    print("checking " + directory + "...")
+    for pkl_item in list(pkl_list):
+        if not (pkl_item[0] in directory_list):
+            print(pkl_item[0] + " seems to have been removed...")
+            pkl_list.remove(pkl_item)
+
+    # save potentially trimmed list back
+    with open(pkl_path, 'wb') as f:
+        pickle.dump(pkl_list, f)
+
+
+consume_new_resources(FOOD_DIR, CLIPS_DIR, AUDIO_DIR, THUMBNAIL_DIR,
+                      BACKGROUND_DIR, clip_pkl, audio_pkl, thumb_pkl,
+                      bck_pkl)
