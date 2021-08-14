@@ -94,7 +94,7 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
         media_body=media_file
     ).execute()
 
-    time.sleep(10)
+    time.sleep(10) 
 
     # only needed if video is not a short
     if upload_thumbnail:
