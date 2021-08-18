@@ -19,3 +19,5 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "../results")
 HOUR_SEGMENTS = os.path.join(OUTPUT_DIR, "hour_segments")
 CLIENT_SECRET_FILE = os.path.join(PARENT_DIR, "client_secret.json")
 VID_NUM_PKL = os.path.join(OUTPUT_DIR, "vid_nums.pkl")
+
+TEMP_CLIPS = os.path.join(BASE_DIR, "../temp_clips")
