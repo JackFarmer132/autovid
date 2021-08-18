@@ -49,13 +49,13 @@ def auto_upload():
     # generate 5 shorts and upload
     for i in range(5):
         # get time upload will occur (every 3 hours from now)
-        time = datetime.datetime(now.year, now.month, now.day, (((now.hour + ((i+1)*2))-1)%24), 0, 0).isoformat() + ".000Z"
+        time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*2))-1), 0, 0).isoformat() + ".000Z"
         title, upload_vid = make_short()
         # upload the short
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
 
 
-def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, time):
+def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, upload_time):
     # needs this so can upload vids of 60 mins
     socket.setdefaulttimeout(999999)
 
@@ -80,9 +80,9 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
     }
 
     # if being uploaded at a specific time, add this in
-    if time:
+    if upload_time:
         request_body["status"]["privacyStatus"] = "private"
-        request_body["status"]["publishAt"] = time
+        request_body["status"]["publishAt"] = upload_time
     else:
         request_body["status"]["privacyStatus"] = "public"
 

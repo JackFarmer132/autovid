@@ -61,7 +61,7 @@ def make_medium():
     aud_dur = 0
 
     # constructs video of at least given length
-    while (vid_dur < 10):
+    while (vid_dur < 600):
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
@@ -89,8 +89,8 @@ def make_medium():
     background_vid = VideoFileClip(background_choice[1])
     background_vid = background_vid.set_duration(vid_dur)
     background_vid = background_vid.resize(newsize=output_vid.size)
-    left_side = background_vid.set_position((-1415, 0))
-    right_side = background_vid.set_position((1415, 0))
+    left_side = background_vid.set_position((-1400, 0))
+    right_side = background_vid.set_position((1400, 0))
     output_vid = CompositeVideoClip([output_vid, left_side, right_side])
 
     output_vid = output_vid.fadeout(1)
@@ -206,10 +206,10 @@ def make_long():
 
     # shuffle vid clips for following week and save
     random.shuffle(vid_list)
-    with open(clip_pkl, 'wb') as f:
+    with open(CLIP_PKL, 'wb') as f:
         pickle.dump(vid_list, f)
 
-    return (title_generator("long"), output_path, make_thumbnail())
+    return (title_generator("long"), os.path.join(OUTPUT_DIR, "new_vid.mp4"), make_thumbnail())
 
 
 def make_thumbnail():
@@ -456,7 +456,3 @@ def checkPickleIntegrity(directory, pkl_path):
     # save potentially trimmed list back
     with open(pkl_path, 'wb') as f:
         pickle.dump(pkl_list, f)
-
-
-title, upload_vid, upload_thumbnail = make_long()
-print(title)
