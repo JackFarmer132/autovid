@@ -1,5 +1,6 @@
 from conf import *
 from clip_times import *
+from trimmer import *
 
 import datetime
 import math
@@ -66,6 +67,8 @@ def make_medium():
         clip_package = vid_list.pop(0)
         # generate clip from package
         clip = VideoFileClip(clip_package[1])
+        # trim borders off clip
+        clip = getBorders(clip)
         # add duration to runtime
         vid_dur += clip.duration
         vid_clips.append(clip)
@@ -73,6 +76,14 @@ def make_medium():
 
     # make video
     output_vid = concatenate_videoclips(vid_clips, method="compose")
+
+    # get background
+    random.shuffle(bck_list)
+    background_choice = bck_list[0]
+    background_vid = VideoFileClip(background_choice[1])
+    background_vid = background_vid.set_duration(vid_dur)
+    output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
+    output_vid = output_vid.fadeout(1)
 
     # constructs audio backing that fits at least the vid length
     while (aud_dur < vid_dur):
@@ -82,18 +93,6 @@ def make_medium():
         aud_dur += aud_clip.duration
         aud_clips.append(aud_clip)
         used_aud_packages.append(clip_package)
-
-    # get background
-    random.shuffle(bck_list)
-    background_choice = bck_list[0]
-    background_vid = VideoFileClip(background_choice[1])
-    background_vid = background_vid.set_duration(vid_dur)
-    background_vid = background_vid.resize(newsize=output_vid.size)
-    left_side = background_vid.set_position((-1400, 0))
-    right_side = background_vid.set_position((1400, 0))
-    output_vid = CompositeVideoClip([output_vid, left_side, right_side])
-
-    output_vid = output_vid.fadeout(1)
 
     # make audio
     output_aud = concatenate_audioclips(aud_clips)
@@ -456,3 +455,6 @@ def checkPickleIntegrity(directory, pkl_path):
     # save potentially trimmed list back
     with open(pkl_path, 'wb') as f:
         pickle.dump(pkl_list, f)
+
+
+make_medium()
