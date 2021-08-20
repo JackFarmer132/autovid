@@ -1,5 +1,4 @@
 from conf import *
-from clip_times import *
 from trimmer import *
 
 import datetime

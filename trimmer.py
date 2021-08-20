@@ -1,5 +1,4 @@
 from conf import *
-from clip_times import *
 
 import datetime
 import math
