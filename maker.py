@@ -8,6 +8,7 @@ import random
 import string
 import pickle
 from shutil import copyfile
+import gc
 
 from moviepy.editor import *
 from PIL import Image
@@ -146,38 +147,68 @@ def make_long():
     with open(BCK_PKL, 'rb') as f:
         bck_list = pickle.load(f)
 
-    # audio things
-    aud_dur = 0
-    aud_clips = []
-
-    # create hour-long video from the 6 segments
+    random.shuffle(vid_list)
+    used_aud_packages= []
     segments = []
+
+    # establish background now so each video has the same
+    random.shuffle(bck_list)
+    background_choice = bck_list[0]
+
     for i in range(6):
-        segment = VideoFileClip(os.path.join(HOUR_SEGMENTS, "segment_" + str(i) + ".mp4"))
-        segments.append(segment)
+        # reading from head, construct video until duration is target
+        vid_clips = []
+        used_vid_packages = []
+        # holds current duration in seconds
+        vid_dur = 0
 
-    # shuffle vids so not as obvious
+        # constructs video of at least given length
+        while (vid_dur < 600):
+            # get front clip
+            clip_package = vid_list.pop(0)
+            # generate clip from package
+            clip = VideoFileClip(clip_package[1])
+            # trim borders off clip
+            clip = getBorders(clip)
+            # add duration to runtime
+            vid_dur += clip.duration
+            vid_clips.append(clip)
+            used_vid_packages.append(clip_package)
+
+        # make video
+        output_vid = concatenate_videoclips(vid_clips, method="compose")
+        # attach background
+        background_vid = VideoFileClip(background_choice[1])
+        background_vid = background_vid.set_duration(vid_dur)
+        output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
+        output_vid.audio = None
+        output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(i) + ".mp4")
+        output_vid.write_videofile(output_path)
+        # append used clips to list
+        vid_list += used_vid_packages
+
+        del vid_clips
+        del clip_package
+        del used_vid_packages
+        del background_vid
+        del clip
+        del output_vid
+        gc.collect()
+
+    # go through and collect the 6 videos for making the hour one
+    for i in range(6):
+        segments.append(VideoFileClip(os.path.join(HOUR_SEGMENTS, "segment_" + str(i) + ".mp4")))
+
+    # leave it to fate to pick a good openning clip
     random.shuffle(segments)
-
-    # add fade in to all but the first segment
-    for i in range(1,6):
-        segments[i] = segments[i].fadein(1)
 
     # make video
     output_vid = concatenate_videoclips(segments, method="compose")
-
-    # add background
-    random.shuffle(bck_list)
-    background_choice = bck_list[0]
-    background_vid = VideoFileClip(background_choice[1])
-    background_vid = background_vid.set_duration(output_vid.duration)
-    background_vid = background_vid.resize(newsize=output_vid.size)
-    left_side = background_vid.set_position((-1400, 0))
-    right_side = background_vid.set_position((1400, 0))
-    output_vid = CompositeVideoClip([output_vid, left_side, right_side])
-
     output_vid = output_vid.fadeout(1)
 
+    # audio things
+    aud_dur = 0
+    aud_clips = []
     # constructs audio backing that fits at least the vid length
     while (aud_dur < output_vid.duration):
         clip_package = aud_list.pop(0)
@@ -200,7 +231,7 @@ def make_long():
 
     # combine video and audio
     output_vid.audio = output_aud
-    output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+    output_path = os.path.join(OUTPUT_DIR, "new_hour.mp4")
     output_vid.write_videofile(output_path)
 
     # shuffle vid clips for following week and save
@@ -455,6 +486,3 @@ def checkPickleIntegrity(directory, pkl_path):
     # save potentially trimmed list back
     with open(pkl_path, 'wb') as f:
         pickle.dump(pkl_list, f)
-
-
-make_medium()

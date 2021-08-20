@@ -24,7 +24,6 @@ def auto_upload():
         # generate main video of 10 minutes
         title, upload_vid, upload_thumbnail = make_medium()
         # save file to hour_segments folder too
-        copyfile(upload_vid, os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4"))
         # configure playlist
         playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
         # upload 10 minute vid

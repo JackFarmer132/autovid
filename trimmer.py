@@ -43,6 +43,7 @@ def findBorderLength(image):
         x += 10
         if x < 656:
             cur_border = max(cur_border, x)
+        # print("=====================")
     return cur_border
 
 
@@ -58,8 +59,8 @@ def getBorders(video):
         right_border = 500
     # helps catch when one border is very off for whatever reason
     if abs(left_border - right_border) >= 100:
-        left_diff = abs(300 - left_border)
-        right_diff = abs(300 - right_border)
+        left_diff = abs(400 - left_border)
+        right_diff = abs(400 - right_border)
         if left_diff > right_diff:
             left_border = right_border
         else:
@@ -71,7 +72,7 @@ def getBorders(video):
     return video.crop(x1=left_border, x2=video.size[0]-right_border)
 
 
-# clip = VideoFileClip(os.path.join(CLIPS_DIR, "N3YRSSA4VD.mp4"))
+# clip = VideoFileClip(os.path.join(TEMP_CLIPS, "EMNXJ4EPLJ.mp4"))
 # # get border lengths
 # clip = getBorders(clip)
 # # base_frame = base_frame.crop((max_border, 0, base_frame.width-max_border, base_frame.height))
