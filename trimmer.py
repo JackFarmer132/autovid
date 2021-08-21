@@ -46,9 +46,9 @@ def findBorderLength(image):
     return cur_border
 
 
-def getBorders(video):
+def getBorders(base_frame):
     # get first frame and blur it
-    base_frame = Image.fromarray(cv2.blur(video.get_frame(0), (15,15)))
+    base_frame = Image.fromarray(cv2.blur(base_frame, (15,15)))
     left_border = findBorderLength(base_frame)
     base_frame = base_frame.transpose(Image.FLIP_LEFT_RIGHT)
     right_border = findBorderLength(base_frame)
@@ -68,7 +68,7 @@ def getBorders(video):
     # apparently you can't have an odd-numbered width, so fix that here
     if ((left_border + right_border) % 2) == 1:
         right_border += 1
-    return video.crop(x1=left_border, x2=video.size[0]-right_border)
+    return (left_border, right_border)
 
 
 # clip = VideoFileClip(os.path.join(TEMP_CLIPS, "EMNXJ4EPLJ.mp4"))

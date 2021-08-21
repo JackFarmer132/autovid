@@ -2,4 +2,3 @@ moviepy
 pillow
 keyboard
 opencv-python
-scikit-image

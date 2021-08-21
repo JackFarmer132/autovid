@@ -1,4 +1,5 @@
 from conf import *
+from trimmer import *
 
 import datetime
 import math
@@ -12,70 +13,37 @@ import time
 
 from moviepy.editor import *
 from PIL import Image, ImageOps
-from skimage.metrics import structural_similarity
 
 
+clip = VideoFileClip(os.path.join(TEMP_CLIPS, "ten.mp4"))
 
-base_clip = VideoFileClip(os.path.join(TEMP_CLIPS, "ten.mp4"))
-# trim away some background to increase differences
-clip = base_clip.crop(x1=300, x2=base_clip.size[0]-300)
-prev_frame = np.empty(0)
-frames = []
-blur = 10
-threshold = 0.65
-frame_no = 0
-
+prev_borders = ()
+threshold = 2
+total_dur = 0
 subclip_start = 0
 subclip_times = []
 
-for f in clip.iter_frames():
-    frame_no += 1
-    total_dur = frame_no/clip.fps
-    if prev_frame.any():
-        # convert to grey to allow analysis
-        cur_frame = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-        # blur a bit to help with noticing similar frames
-        cur_frame = cv2.blur(cur_frame, (blur,blur))
-        (score, _) = structural_similarity(cur_frame, prev_frame, full=True)
-        # print("at time " + str(round(frame_no/clip.fps,5)) + ", score is " + str(score))
-        if score <= threshold:
-            print("at time " + str(round(total_dur,5)) + ", score is " + str(score))
-            subclip_times.append((subclip_start, (total_dur-0.1)))
+for i in range(10*(int(clip.duration)+1)):
+    frame = clip.get_frame((i*0.1))
+    total_dur += 0.1
+    if prev_borders:
+        cur_borders = getBorders(frame)
+        # if borders are different, then new clip has started
+        if (abs(cur_borders[0]-prev_borders[0])>threshold) and (abs(cur_borders[1]-prev_borders[1])>threshold):
+            print("at time " + str(round(total_dur,5)))
+            subclip_times.append((subclip_start, (total_dur-0.2)))
             subclip_start = total_dur + 0.1
-        prev_frame = cur_frame
+        # update
+        prev_borders = cur_borders
     else:
-        prev_frame = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-        prev_frame = cv2.blur(prev_frame, (blur,blur))
+        prev_borders = getBorders(frame)
 # append final clip
 subclip_times.append((subclip_start, (clip.duration - 0.1)))
 
-print(subclip_times)
-
 for i, (subclip_start, subclip_end) in enumerate(subclip_times):
-    # if clip is over 4 seconds, then use it
-    if (subclip_end - subclip_start) >= 4:
-        subclip = base_clip.subclip(subclip_start, subclip_end)
+    # if clip is invalid size, don't make it
+    if ((subclip_end - subclip_start) >= 5) and ((subclip_end - subclip_start) <= 35):
+        subclip = clip.subclip(subclip_start, subclip_end)
+        subclip.audio = None
         output_path = os.path.join(TEMP_CLIPS, "frames/clip_" + str(i) + ".mp4")
         subclip.write_videofile(output_path)
-
-
-# frames = []
-# for f in clip.iter_frames():
-#     frames.append(f)
-#     print(f.shape)
-#
-# print(frames[0].shape)
-# print("===========================")
-# frame_one = Image.fromarray(frames[0]).convert('RGBA')
-# frame_end = Image.fromarray(frames[-1]).convert('RGBA')
-#
-# frame_end.putalpha(127)
-#
-# frame_one.save(os.path.join(TEMP_CLIPS, "frames/one.png"))
-# frame_end.save(os.path.join(TEMP_CLIPS, "frames/end.png"))
-#
-# frame_one.paste(frame_end, (0, 0), frame_end)
-# frame_one.save(os.path.join(TEMP_CLIPS, "frames/merge.png"))
-#
-# frame_one = np.array(frame_one)[...,:-1]
-# print(frame_one.shape)
