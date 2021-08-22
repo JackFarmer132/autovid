@@ -12,33 +12,16 @@ import gc
 from moviepy.editor import *
 from PIL import Image
 
-# use this if you need to remake the list if clips folder is updated
-def struct_maker(directories, pickle_paths):
-
-    for i in range(len(directories)):
-        newlist = []
-        directory = directories[i]
-        pkl_path = pickle_paths[i]
-
-        # for each clip in the folder
-        for fname in os.listdir(directory):
-            path = os.path.join(directory, fname)
-            # filename, filepath
-            entry = (fname, path)
-            newlist.append(entry)
-        # shuffle, baby!
-        random.shuffle(newlist)
-        # save with pickle
-        with open(pkl_path, 'wb') as f:
-            pickle.dump(newlist, f)
-
 
 # make video with clips with target duration of 10 minutes
 def make_medium():
     # ensure any deletions from the key directories are noted in pickle lists
-    checkPickleIntegrity(CLIPS_DIR, CLIP_PKL)
-    checkPickleIntegrity(AUDIO_DIR, AUD_PKL)
-    checkPickleIntegrity(THUMBNAIL_DIR, THUMB_PKL)
+    check_pickle_integrity(CLIPS_DIR, CLIP_PKL)
+    check_pickle_integrity(AUDIO_DIR, AUD_PKL)
+    check_pickle_integrity(THUMBNAIL_DIR, THUMB_PKL)
+
+    # load up on new food if empty from checking
+    refill_clips()
 
     # read in clips list
     with open(CLIP_PKL, 'rb') as f:
@@ -66,7 +49,7 @@ def make_medium():
         # get front clip
         clip_package = vid_list.pop(0)
         # generate clip from package
-        clip = VideoFileClip(clip_package[1])
+        clip = VideoFileClip(clip_package)
         # trim borders off clip
         (left_border, right_border) = getBorders(clip.get_frame(0))
         clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
@@ -81,7 +64,7 @@ def make_medium():
     # get background
     random.shuffle(bck_list)
     background_choice = bck_list[0]
-    background_vid = VideoFileClip(background_choice[1])
+    background_vid = VideoFileClip(background_choice)
     background_vid = background_vid.set_duration(vid_dur)
     output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
     output_vid = output_vid.fadeout(1)
@@ -90,7 +73,7 @@ def make_medium():
     while (aud_dur < vid_dur):
         clip_package = aud_list.pop(0)
         # generate music clip
-        aud_clip = AudioFileClip(clip_package[1])
+        aud_clip = AudioFileClip(clip_package)
         aud_dur += aud_clip.duration
         aud_clips.append(aud_clip)
         used_aud_packages.append(clip_package)
@@ -110,8 +93,8 @@ def make_medium():
     output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
     output_vid.write_videofile(output_path)
 
-    # append used clips to list and save
-    vid_list += used_vid_packages
+    # if new food, get rid of used clips and replace with new ones, else just append
+    vid_list = update_clips(used_vid_packages, vid_list)
 
     # add audio back to list
     aud_list += used_aud_packages
@@ -129,11 +112,12 @@ def make_medium():
 # make video with clips with target duration of 10 minutes
 def make_long():
     # ensure any deletions from the key directories are noted in pickle lists
-    checkPickleIntegrity(CLIPS_DIR, CLIP_PKL)
-    checkPickleIntegrity(AUDIO_DIR, AUD_PKL)
-    checkPickleIntegrity(THUMBNAIL_DIR, THUMB_PKL)
-    # eat anything new for the week ahead
-    consume_new_resources()
+    check_pickle_integrity(CLIPS_DIR, CLIP_PKL)
+    check_pickle_integrity(AUDIO_DIR, AUD_PKL)
+    check_pickle_integrity(THUMBNAIL_DIR, THUMB_PKL)
+
+    # load up on new food if empty from checking
+    refill_clips()
 
     # read in clips list
     with open(CLIP_PKL, 'rb') as f:
@@ -167,7 +151,7 @@ def make_long():
             # get front clip
             clip_package = vid_list.pop(0)
             # generate clip from package
-            clip = VideoFileClip(clip_package[1])
+            clip = VideoFileClip(clip_package)
             # trim borders off clip
             (left_border, right_border) = getBorders(clip.get_frame(0))
             clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
@@ -179,7 +163,7 @@ def make_long():
         # make video
         output_vid = concatenate_videoclips(vid_clips, method="compose")
         # attach background
-        background_vid = VideoFileClip(background_choice[1])
+        background_vid = VideoFileClip(background_choice)
         background_vid = background_vid.set_duration(vid_dur)
         output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
         output_vid.audio = None
@@ -214,7 +198,7 @@ def make_long():
     while (aud_dur < output_vid.duration):
         clip_package = aud_list.pop(0)
         # generate music clip
-        aud_clip = AudioFileClip(clip_package[1])
+        aud_clip = AudioFileClip(clip_package)
         aud_dur += aud_clip.duration
         aud_clips.append(aud_clip)
         # add package to end of list again since needs to repeat some songs
@@ -240,7 +224,7 @@ def make_long():
     with open(CLIP_PKL, 'wb') as f:
         pickle.dump(vid_list, f)
 
-    return (title_generator("long"), os.path.join(OUTPUT_DIR, "new_vid.mp4"), make_thumbnail())
+    return (title_generator("long"), os.path.join(OUTPUT_DIR, "new_hour.mp4"), make_thumbnail())
 
 
 def make_thumbnail():
@@ -252,8 +236,8 @@ def make_thumbnail():
     left_package = candidates.pop(0)
     right_package = candidates.pop(0)
     # get images for thumbnail
-    left_img = Image.open(left_package[1])
-    right_img = Image.open(right_package[1])
+    left_img = Image.open(left_package)
+    right_img = Image.open(right_package)
 
     file_path = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
 
@@ -278,9 +262,13 @@ def make_thumbnail():
 # make video with clips with target duration of 10 minutes
 def make_short():
     # ensure any deletions from the key directories are noted in pickle lists
-    checkPickleIntegrity(CLIPS_DIR, CLIP_PKL)
-    checkPickleIntegrity(AUDIO_DIR, AUD_PKL)
-    checkPickleIntegrity(THUMBNAIL_DIR, THUMB_PKL)
+    check_pickle_integrity(CLIPS_DIR, CLIP_PKL)
+    check_pickle_integrity(AUDIO_DIR, AUD_PKL)
+    check_pickle_integrity(THUMBNAIL_DIR, THUMB_PKL)
+
+    # load up on new food if empty from checking
+    refill_clips()
+
     # read in clips list
     with open(CLIP_PKL, 'rb') as f:
         vid_list = pickle.load(f)
@@ -309,7 +297,7 @@ def make_short():
             # get front clip
             clip_package = vid_list.pop(0)
             # generate clip from package
-            clip = VideoFileClip(clip_package[1])
+            clip = VideoFileClip(clip_package)
             # add duration to runtime
             vid_dur += clip.duration
             vid_clips.append(clip)
@@ -329,7 +317,7 @@ def make_short():
     while (aud_dur < vid_dur):
         clip_package = aud_list.pop(0)
         # generate music clip
-        aud_clip = AudioFileClip(clip_package[1])
+        aud_clip = AudioFileClip(clip_package)
         aud_dur += aud_clip.duration
         aud_clips.append(aud_clip)
         used_aud_packages.append(clip_package)
@@ -425,65 +413,67 @@ def title_generator(vid_type):
         return "1 Hour " + random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
 
 
-# goes through the food bin and sorts new clips/audio/thumbnails into correct places
-def consume_new_resources():
-    new_clip = False
-    new_audio = False
-    new_thumbnail = False
-    directories = []
-    pickle_paths = []
-    # for each file in the food directory
-    for fname in os.listdir(FOOD_DIR):
-        # get path
-        fname_path = os.path.join(FOOD_DIR, fname)
-        # if file is video, is a new clip
-        if (".mp4" in fname):
-            new_clip = True
-            new_fname = random_file_name_generator() + ".mp4"
-            new_home = os.path.join(CLIPS_DIR, new_fname)
-        # if audio
-        elif (".mp3" in fname):
-            new_audio = True
-            new_fname = random_file_name_generator() + ".mp3"
-            new_home = os.path.join(AUDIO_DIR, new_fname)
-        # if thumbnail
-        elif (".jpg" in fname):
-            new_thumbnail = True
-            new_fname = random_file_name_generator() + ".jpg"
-            new_home = os.path.join(THUMBNAIL_DIR, new_fname)
-        # otherwise is unrecognised and leavve it be
-        else:
-            continue
-        # move the target file with new name and location
-        os.rename(fname_path, new_home)
-    # update pickle lists if new things were added
-    if new_clip:
-        directories.append(CLIPS_DIR)
-        pickle_paths.append(CLIP_PKL)
-    if new_audio:
-        directories.append(AUDIO_DIR)
-        pickle_paths.append(AUD_PKL)
-    if new_thumbnail:
-        directories.append(THUMBNAIL_DIR)
-        pickle_paths.append(THUMB_PKL)
-
-    directories.append(BACKGROUND_DIR)
-    pickle_paths.append(BCK_PKL)
-
-    struct_maker(directories, pickle_paths)
-
-
-def checkPickleIntegrity(directory, pkl_path):
+def check_pickle_integrity(directory, pkl_path):
     # get the two lists for comparison
     with open(pkl_path, 'rb') as f:
         pkl_list = pickle.load(f)
     directory_list = os.listdir(directory)
+    # build list of existing file_paths
+    directory_paths = []
+    for fname in directory_list:
+        directory_paths.append(os.path.join(directory, fname))
     print("checking " + directory + "...")
     for pkl_item in list(pkl_list):
-        if not (pkl_item[0] in directory_list):
-            print(pkl_item[0] + " seems to have been removed...")
+        if not (pkl_item in directory_paths):
+            print(pkl_item + " seems to have been removed...")
             pkl_list.remove(pkl_item)
-
     # save potentially trimmed list back
     with open(pkl_path, 'wb') as f:
         pickle.dump(pkl_list, f)
+
+
+def refill_clips():
+    # read in clips list
+    with open(CLIP_PKL, 'rb') as f:
+        vid_list = pickle.load(f)
+
+    food_clips = os.listdir(FOOD_DIR)
+    # get number of new clips needed to get back to safe size
+    missing_clips = 1500 - len(vid_list)
+    # while there are still food clips and they need to be used
+    while (missing_clips and food_clips):
+        clip = food_clips.pop(0)
+        new_clip_name = random_file_name_generator() + ".mp4"
+        old_clip_path = os.path.join(FOOD_DIR, clip)
+        new_clip_path = os.path.join(TEMP_CLIPS, new_clip_name)
+        # move clip from food to clips
+        os.rename(old_clip_path, new_clip_path)
+        vid_list.append(new_clip_path)
+        # update this to show list got bigger
+        missing_clips -= 1
+
+
+def update_clips(used_clips, pickle_clips):
+    # get a list of clips in the food dir
+    food_clips = os.listdir(FOOD_DIR)
+    # only exchange clips if there are any new ones to be eaten
+    if food_clips:
+        for i in range(len(list(used_clips))):
+            # try and get new food clip to replace one of the used ones
+            try:
+                new_clip = food_clips.pop(0)
+                new_clip_name = random_file_name_generator() + ".mp4"
+                old_clip_path = os.path.join(FOOD_DIR, new_clip)
+                new_clip_path = os.path.join(CLIPS_DIR, new_clip_name)
+                # get rid of a used clip
+                used_clip_path = used_clips.pop(0)
+                # # delete this old clip
+                os.rename(used_clip_path, os.path.join(TEMP_CLIPS, (random_file_name_generator() + ".mp4")))
+                # add new clip to this thing
+                used_clips.append(new_clip_path)
+                # move new clip to the clip directory
+                os.rename(old_clip_path, new_clip_path)
+            # otherwise not enough food to replace all used clips, so break
+            except IndexError:
+                break
+    return pickle_clips + used_clips

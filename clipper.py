@@ -16,7 +16,7 @@ from moviepy.editor import *
 from PIL import Image, ImageOps
 
 
-def clipSource(fname, fpath):
+def clip_source(fname, fpath):
     fname = fname[:-4]
     clip = VideoFileClip(fpath)
     clip = clip.set_fps(25)
@@ -31,26 +31,6 @@ def clipSource(fname, fpath):
     cur_percent = 0
     print("|", end="", flush=True)
 
-    # for i in range(10*(int(clip.duration/2))):
-    #     frame = clip.get_frame((i*0.2))
-    #     total_dur = round((total_dur+0.2),1)
-    #     cur_percent += 0.2
-    #     if prev_borders:
-    #         cur_borders = getBorders(frame)
-    #         # if borders are different, then new clip has started
-    #         if (abs(cur_borders[0]-prev_borders[0])>threshold) and (abs(cur_borders[1]-prev_borders[1])>threshold):
-    #             # print("at time " + str(round(total_dur,5)))
-    #             subclip_times.append((subclip_start, (total_dur-0.4)))
-    #             subclip_start = total_dur + 0.3
-    #         # update
-    #         prev_borders = cur_borders
-    #     else:
-    #         prev_borders = getBorders(frame)
-    #     # update process bar if another percent of vid has been parsed
-    #     if (cur_percent >= seconds_per_bar):
-    #         print("=", end="", flush=True)
-    #         cur_percent = 0
-
     seen_frames = 0
     # sees how many frames needed until 0.2 seconds has passed
     frames_until_target = (clip.fps/5)
@@ -61,7 +41,7 @@ def clipSource(fname, fpath):
             total_dur = round((total_dur+0.2),1)
             cur_percent += 0.2
             if prev_borders:
-                cur_borders = getBorders(frame)
+                cur_borders = get_borders(frame)
                 # if borders are different, then new clip has started
                 if (abs(cur_borders[0]-prev_borders[0])>threshold) and (abs(cur_borders[1]-prev_borders[1])>threshold):
                     # print("at time " + str(round(total_dur,5)))
@@ -70,14 +50,12 @@ def clipSource(fname, fpath):
                 # update
                 prev_borders = cur_borders
             else:
-                prev_borders = getBorders(frame)
+                prev_borders = get_borders(frame)
             # update process bar if another percent of vid has been parsed
             if (cur_percent >= seconds_per_bar):
                 print("=", end="", flush=True)
                 cur_percent = 0
             seen_frames = 0
-        # otherwise keep skipping frames
-
 
     # append final clip
     subclip_times.append((subclip_start, (clip.duration - 0.1)))
@@ -94,14 +72,10 @@ def clipSource(fname, fpath):
         gc.collect()
 
 
-
-def cleanChoppingBoard():
+def clean_chopping_board():
     # go through all new full vids and generate clips
     for fname in os.listdir(CHOPPING_BOARD):
         print("beginning parse of " + fname + "...")
         fpath = os.path.join(CHOPPING_BOARD, fname)
-        clipSource(fname, fpath)
+        clip_source(fname, fpath)
         # os.remove(fpath)
-
-
-cleanChoppingBoard()

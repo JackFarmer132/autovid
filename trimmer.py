@@ -13,7 +13,7 @@ import time
 from moviepy.editor import *
 from PIL import Image, ImageOps
 
-def findBorderLength(image):
+def find_border_length(image):
     cur_border = 0
     # find the border for the left of the clip
     for y in range(0, int(image.height), 10):
@@ -46,12 +46,12 @@ def findBorderLength(image):
     return cur_border
 
 
-def getBorders(base_frame):
+def get_borders(base_frame):
     # get first frame and blur it
     base_frame = Image.fromarray(cv2.blur(base_frame, (15,15)))
-    left_border = findBorderLength(base_frame)
+    left_border = find_border_length(base_frame)
     base_frame = base_frame.transpose(Image.FLIP_LEFT_RIGHT)
-    right_border = findBorderLength(base_frame)
+    right_border = find_border_length(base_frame)
     # fix any errors
     if (not left_border) and (not right_border):
         left_border = 500
@@ -69,62 +69,3 @@ def getBorders(base_frame):
     if ((left_border + right_border) % 2) == 1:
         right_border += 1
     return (left_border, right_border)
-
-
-# clip = VideoFileClip(os.path.join(TEMP_CLIPS, "EMNXJ4EPLJ.mp4"))
-# # get border lengths
-# clip = getBorders(clip)
-# # base_frame = base_frame.crop((max_border, 0, base_frame.width-max_border, base_frame.height))
-# # base_frame.save(os.path.join(TEMP_CLIPS, "0-trimmed.png"))
-# clip.write_videofile(os.path.join(TEMP_CLIPS, "zzzzzzzz/trimmed.mp4"))
-
-
-# # read in clips list
-# with open(CLIP_PKL, 'rb') as f:
-#     vid_list = pickle.load(f)
-# # read in audio list
-# with open(AUD_PKL, 'rb') as f:
-#     aud_list = pickle.load(f)
-#
-# # reading from head, construct video until duration is target
-# vid_clips = []
-# aud_clips = []
-# # holds current duration in seconds
-# vid_dur = 0
-# aud_dur = 0
-#
-# # constructs video of at least given length
-# while (vid_dur < 600):
-#     clip = VideoFileClip(vid_list.pop(0)[1])
-#     trimmed_clip = getBorders(clip)
-#     # add duration to runtime
-#     vid_dur += trimmed_clip.duration
-#     vid_clips.append(trimmed_clip)
-#
-# # make video
-# output_vid = concatenate_videoclips(vid_clips, method="compose")
-# output_vid = output_vid.fadeout(1)
-#
-# background_vid = VideoFileClip(os.path.join(TEMP_CLIPS, "background.mp4"))
-# background_vid = background_vid.set_duration(output_vid.duration)
-# output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
-#
-# # constructs audio backing that fits at least the vid length
-# while (aud_dur < vid_dur):
-#     aud_clip = AudioFileClip(aud_list.pop(0)[1])
-#     aud_dur += aud_clip.duration
-#     aud_clips.append(aud_clip)
-#
-# output_aud = concatenate_audioclips(aud_clips)
-# # trim audio to fit video and re-add fade-out
-# output_aud = output_aud.subclip(0,vid_dur)
-# # normalize audio
-# output_aud = output_aud.audio_normalize()
-# # make a bit quieter since is pretty loud by default
-# output_aud = output_aud.volumex(0.6)
-# output_aud = output_aud.audio_fadeout(7)
-#
-# # combine video and audio
-# output_vid.audio = output_aud
-# output_path = os.path.join(TEMP_CLIPS, "new_vid.mp4")
-# output_vid.write_videofile(output_path)

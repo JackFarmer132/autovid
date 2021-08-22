@@ -26,7 +26,7 @@ def auto_upload():
         title, upload_vid, upload_thumbnail = make_medium()
         # title = title_generator("medium")
         # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-        # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
+        # upload_thumbnail = make_thumbnail()
         youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
     else:
         print("making long video...")
@@ -34,7 +34,7 @@ def auto_upload():
         title, upload_vid, upload_thumbnail = make_long()
         # title = title_generator("long")
         # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
-        # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
+        # upload_thumbnail = make_thumbnail()
         youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
 
     # configure metadata for shorts
