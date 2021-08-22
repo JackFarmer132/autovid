@@ -21,20 +21,20 @@ def auto_upload():
 
     # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
     if datetime.datetime.today().weekday() != 6:
-        # generate main video of 10 minutes
-        title, upload_vid, upload_thumbnail = make_medium()
-        # save file to hour_segments folder too
-        # configure playlist
+        print("making medium video...")
         playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-        # upload 10 minute vid
+        title, upload_vid, upload_thumbnail = make_medium()
+        # title = title_generator("medium")
+        # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+        # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
         youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
-    # sunday so time for a phat hour long upload
     else:
-        # generate main video of 60 minutes
-        title, upload_vid, upload_thumbnail = make_long()
-        # configure playlist
+        print("making long video...")
         playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
-        # upload 10 minute vid
+        title, upload_vid, upload_thumbnail = make_long()
+        # title = title_generator("long")
+        # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
+        # upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
         youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
 
     # configure metadata for shorts
@@ -44,6 +44,7 @@ def auto_upload():
 
     # get current time for scheduling uploads
     now = datetime.datetime.now()
+    print("making short videos...")
 
     # generate 5 shorts and upload
     for i in range(5):
@@ -125,13 +126,3 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
 
 
 auto_upload()
-
-# # for when there are errors...
-# socket.setdefaulttimeout(999999)
-# title = title_generator("medium")
-# upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-# upload_thumbnail = os.path.join(OUTPUT_DIR, "new_thumbnail.jpg")
-# description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
-# tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
-# playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-# youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)

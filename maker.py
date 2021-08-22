@@ -68,8 +68,8 @@ def make_medium():
         # generate clip from package
         clip = VideoFileClip(clip_package[1])
         # trim borders off clip
-        (left_border, right_border) = getBorders(video.get_frame(0))
-        clip.crop(x1=left_border, x2=clip.size[0]-right_border)
+        (left_border, right_border) = getBorders(clip.get_frame(0))
+        clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
         # add duration to runtime
         vid_dur += clip.duration
         vid_clips.append(clip)
@@ -169,8 +169,8 @@ def make_long():
             # generate clip from package
             clip = VideoFileClip(clip_package[1])
             # trim borders off clip
-            (left_border, right_border) = getBorders(video.get_frame(0))
-            clip.crop(x1=left_border, x2=clip.size[0]-right_border)
+            (left_border, right_border) = getBorders(clip.get_frame(0))
+            clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
             # add duration to runtime
             vid_dur += clip.duration
             vid_clips.append(clip)
