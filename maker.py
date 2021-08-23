@@ -51,7 +51,7 @@ def make_medium():
         # generate clip from package
         clip = VideoFileClip(clip_package)
         # trim borders off clip
-        (left_border, right_border) = getBorders(clip.get_frame(0))
+        (left_border, right_border) = get_borders(clip.get_frame(0))
         clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
         # add duration to runtime
         vid_dur += clip.duration
@@ -153,7 +153,7 @@ def make_long():
             # generate clip from package
             clip = VideoFileClip(clip_package)
             # trim borders off clip
-            (left_border, right_border) = getBorders(clip.get_frame(0))
+            (left_border, right_border) = get_borders(clip.get_frame(0))
             clip = clip.crop(x1=left_border, x2=clip.size[0]-right_border)
             # add duration to runtime
             vid_dur += clip.duration
@@ -439,18 +439,20 @@ def refill_clips():
 
     food_clips = os.listdir(FOOD_DIR)
     # get number of new clips needed to get back to safe size
-    missing_clips = 1500 - len(vid_list)
+    missing_clips = 1000 - len(vid_list)
     # while there are still food clips and they need to be used
     while (missing_clips and food_clips):
         clip = food_clips.pop(0)
         new_clip_name = random_file_name_generator() + ".mp4"
         old_clip_path = os.path.join(FOOD_DIR, clip)
-        new_clip_path = os.path.join(TEMP_CLIPS, new_clip_name)
+        new_clip_path = os.path.join(CLIPS_DIR, new_clip_name)
         # move clip from food to clips
         os.rename(old_clip_path, new_clip_path)
         vid_list.append(new_clip_path)
         # update this to show list got bigger
         missing_clips -= 1
+    with open(CLIP_PKL, 'wb') as f:
+        pickle.dump(vid_list, f)
 
 
 def update_clips(used_clips, pickle_clips):
@@ -467,8 +469,8 @@ def update_clips(used_clips, pickle_clips):
                 new_clip_path = os.path.join(CLIPS_DIR, new_clip_name)
                 # get rid of a used clip
                 used_clip_path = used_clips.pop(0)
-                # # delete this old clip
-                os.rename(used_clip_path, os.path.join(TEMP_CLIPS, (random_file_name_generator() + ".mp4")))
+                # delete this old clip
+                os.rename(used_clip_path, os.path.join(EXPIRED_DIR, (random_file_name_generator() + ".mp4")))
                 # add new clip to this thing
                 used_clips.append(new_clip_path)
                 # move new clip to the clip directory

@@ -9,6 +9,7 @@ import sys
 
 from conf import *
 from maker import *
+from clipper import *
 
 from Google import Create_Service
 from googleapiclient.http import MediaFileUpload
@@ -53,6 +54,8 @@ def auto_upload():
         title, upload_vid = make_short()
         # upload the short
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
+    print("eating anything new...")
+    clean_chopping_board()
 
 
 def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, upload_time):
@@ -123,6 +126,5 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
     vid_nums[vid_type] += 1
     with open(VID_NUM_PKL, 'wb') as f:
         pickle.dump(vid_nums, f)
-
 
 auto_upload()
