@@ -97,7 +97,7 @@ def make_medium():
     vid_list = update_clips(used_vid_packages, vid_list)
 
     # add audio back to list
-    aud_list += used_aud_packages
+    aud_list = update_pickles(used_aud_packages, AUDIO_DIR)
 
     # save with pickle
     with open(CLIP_PKL, 'wb') as f:
@@ -248,10 +248,8 @@ def make_thumbnail():
     background.paste(right_img, (483,0))
     background.save(file_path)
 
-    # shuffle list and store again
-    random.shuffle(candidates)
-    candidates.append(left_package)
-    candidates.append(right_package)
+    # get any newly added thumbnails into pckl and have most recent added to end
+    candidates = update_pickles([left_package, right_package], THUMBNAIL_DIR)
 
     with open(THUMB_PKL, 'wb') as f:
         pickle.dump(candidates, f)
@@ -479,3 +477,16 @@ def update_clips(used_clips, pickle_clips):
             except IndexError:
                 break
     return pickle_clips + used_clips
+
+
+def update_pickles(used_packages, directory):
+    new_pickle = []
+    for fname in os.listdir(directory):
+        fpath = os.path.join(directory, fname)
+        # only add to new file if not used
+        if not (fpath in used_packages):
+            new_pickle.append(fpath)
+    # add used packages to end so they aren't immediately used
+    random.shuffle(new_pickle)
+    new_pickle += used_packages
+    return new_pickle

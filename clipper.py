@@ -30,17 +30,17 @@ def clip_source(fname, fpath):
     cur_percent = 0
     print("|", end="", flush=True)
 
-    for i in range(int(clip.duration)*5):
-        time = round((i*0.2), 1)
+    for i in range(int(clip.duration/2)*5):
+        time = round((i*0.4), 1)
         frame = clip.get_frame(time)
-        total_dur = round((total_dur+0.2),1)
-        cur_percent += 0.2
+        total_dur = round((total_dur+0.4),1)
+        cur_percent += 0.4
         if prev_borders:
             cur_borders = get_borders(frame)
             # if borders are different, then new clip has started
             if (abs(cur_borders[0]-prev_borders[0])>threshold) and (abs(cur_borders[1]-prev_borders[1])>threshold):
                 # print("at time " + str(round(total_dur,5)))
-                subclip_times.append((subclip_start, (total_dur-0.3)))
+                subclip_times.append((subclip_start, (total_dur-0.6)))
                 subclip_start = total_dur + 0.1
             # update
             prev_borders = cur_borders
@@ -56,7 +56,6 @@ def clip_source(fname, fpath):
     subclip_times.append((subclip_start, (clip.duration - 0.1)))
     print("=", end="", flush=True)
     print("|")
-    print(subclip_times)
     print("writing new clips...")
     for i, (subclip_start, subclip_end) in enumerate(subclip_times):
         # if clip is invalid size, don't make it
@@ -64,7 +63,7 @@ def clip_source(fname, fpath):
             subclip = clip.subclip(subclip_start, subclip_end)
             subclip.audio = None
             subclip = subclip.set_fps(round(subclip.fps))
-            output_path = os.path.join(TEMP_CLIPS, fname + "_" + str(i) + ".mp4")
+            output_path = os.path.join(FOOD_DIR, fname + "_" + str(i) + ".mp4")
             subclip.write_videofile(output_path)
         gc.collect()
 
@@ -75,7 +74,7 @@ def clean_chopping_board():
         print("beginning parse of " + fname + "...")
         fpath = os.path.join(CHOPPING_BOARD, fname)
         clip_source(fname, fpath)
-        new_fpath = os.path.join(EXPIRED_DIR, "fname")
+        new_fpath = os.path.join(EXPIRED_DIR, fname)
         os.rename(fpath, new_fpath)
 
 

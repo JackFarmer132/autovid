@@ -56,6 +56,7 @@ def auto_upload():
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
     print("eating anything new...")
     clean_chopping_board()
+    print("done!")
 
 
 def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, upload_time):
