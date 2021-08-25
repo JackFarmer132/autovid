@@ -461,6 +461,3 @@ def update_pickles(used_packages, directory):
     random.shuffle(new_pickle)
     new_pickle += used_packages
     return new_pickle
-
-
-make_medium()

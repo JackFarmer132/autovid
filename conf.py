@@ -1,7 +1,8 @@
 import os
+import sys
 
-ABS_PATH = os.path.abspath(__file__)
-BASE_DIR = os.path.dirname(ABS_PATH)
+
+BASE_DIR = "/mnt/h/Personal/projects/autovid/autovid"
 PARENT_DIR = os.path.join(BASE_DIR, "../")
 FOOD_DIR = os.path.join(PARENT_DIR, "food")
 CHOPPING_BOARD = os.path.join(PARENT_DIR, "chopping_board")

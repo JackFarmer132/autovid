@@ -2,7 +2,6 @@
 
 import datetime
 import webbrowser
-import keyboard
 import time
 import socket
 import sys
