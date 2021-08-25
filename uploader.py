@@ -9,7 +9,6 @@ import sys
 
 from conf import *
 from maker import *
-from clipper import *
 
 from Google import Create_Service
 from googleapiclient.http import MediaFileUpload
@@ -54,8 +53,6 @@ def auto_upload():
         title, upload_vid = make_short()
         # upload the short
         youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
-    print("eating anything new...")
-    clean_chopping_board()
     print("done!")
 
 
