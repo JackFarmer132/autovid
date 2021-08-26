@@ -1,20 +1,5 @@
-from conf import *
 from trimmer import *
-
-import datetime
-import math
-import string
-import pickle
-import cv2
-import random
-import numpy as np
-from shutil import copyfile
-import time
 import gc
-
-from moviepy.editor import *
-from PIL import Image, ImageOps
-
 
 def clip_source(fname, fpath):
     fname = fname[:-4]

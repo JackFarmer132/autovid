@@ -1,5 +1,5 @@
+from conf import *
 import pickle
-import os
 from google_auth_oauthlib.flow import Flow, InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -16,7 +16,7 @@ def Create_Service(client_secret_file, api_name, api_version, *scopes):
 
     cred = None
 
-    pickle_file = f'token_{API_SERVICE_NAME}_{API_VERSION}.pickle'
+    pickle_file = os.path.join(BASE_DIR, "token_youtube_v3.pickle")
     # print(pickle_file)
 
     if os.path.exists(pickle_file):

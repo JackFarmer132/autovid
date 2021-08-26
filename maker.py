@@ -1,16 +1,5 @@
-from conf import *
 from trimmer import *
-
-import datetime
-import math
-import random
-import string
-import pickle
-from shutil import copyfile
 import gc
-
-from moviepy.editor import *
-from PIL import Image
 
 
 # make video with clips with target duration of 10 minutes

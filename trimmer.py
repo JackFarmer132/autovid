@@ -1,5 +1,4 @@
 from conf import *
-
 import datetime
 import math
 import string
@@ -9,9 +8,9 @@ import random
 import numpy as np
 from shutil import copyfile
 import time
-
 from moviepy.editor import *
 from PIL import Image, ImageOps
+
 
 def find_border_length(image):
     cur_border = 0

@@ -1,16 +1,9 @@
 # https://developers.google.com/youtube/v3/docs/videos/insert
-
-import datetime
-import webbrowser
-import time
-import socket
-import sys
-
-from conf import *
 from maker import *
-
 from Google import Create_Service
 from googleapiclient.http import MediaFileUpload
+import webbrowser
+import socket
 
 
 def auto_upload():
@@ -18,23 +11,23 @@ def auto_upload():
     description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
     tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
 
-    # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
-    if datetime.datetime.today().weekday() != 6:
-        print("making medium video...")
-        playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-        title, upload_vid, upload_thumbnail = make_medium()
-        # title = title_generator("medium")
-        # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-        # upload_thumbnail = make_thumbnail()
-        youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
-    else:
-        print("making long video...")
-        playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
-        title, upload_vid, upload_thumbnail = make_long()
-        # title = title_generator("long")
-        # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
-        # upload_thumbnail = make_thumbnail()
-        youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
+    # # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
+    # if datetime.datetime.today().weekday() != 6:
+    #     print("making medium video...")
+    #     playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
+    #     title, upload_vid, upload_thumbnail = make_medium()
+    #     # title = title_generator("medium")
+    #     # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+    #     # upload_thumbnail = make_thumbnail()
+    #     youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
+    # else:
+    #     print("making long video...")
+    #     playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
+    #     title, upload_vid, upload_thumbnail = make_long()
+    #     # title = title_generator("long")
+    #     # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
+    #     # upload_thumbnail = make_thumbnail()
+    #     youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
 
     # configure metadata for shorts
     description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
