@@ -16,7 +16,7 @@ def Create_Service(client_secret_file, api_name, api_version, *scopes):
 
     cred = None
 
-    pickle_file = os.path.join(BASE_DIR, "token_youtube_v3.pickle")
+    pickle_file = TOKEN
     # print(pickle_file)
 
     if os.path.exists(pickle_file):

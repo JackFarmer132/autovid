@@ -184,7 +184,7 @@ def make_long():
     with open(BCK_PKL, 'wb') as f:
         pickle.dump(bck_list, f)
 
-    return (title_generator("long"), os.path.join(OUTPUT_DIR, "new_hour.mp4"), make_thumbnail())
+    return (title_generator("long"), output_path, make_thumbnail())
 
 
 def make_thumbnail():
@@ -450,3 +450,18 @@ def update_pickles(used_packages, directory):
     random.shuffle(new_pickle)
     new_pickle += used_packages
     return new_pickle
+
+
+def rebuild_pickles(pkl_path, directory):
+    new_pkl = []
+    for fname in os.listdir(directory):
+        fpath = os.path.join(directory, fname)
+        new_pkl.append(fpath)
+    random.shuffle(new_pkl)
+    with open(pkl_path, 'wb') as f:
+        pickle.dump(new_pkl, f)
+
+# rebuild_pickles(CLIP_PKL, CLIPS_DIR)
+# rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
+# rebuild_pickles(AUD_PKL, AUDIO_DIR)
+# rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
