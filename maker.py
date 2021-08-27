@@ -47,19 +47,23 @@ def make_medium():
         vid_clips.append(clip)
         used_vid_packages.append(clip_package)
 
-    # make video
-    output_vid = concatenate_videoclips(vid_clips, method="compose")
-
+    # shake them up for the hour long segment
+    random.shuffle(vid_clips)
     # make segment clip for the hour long vid
+    segment_vid = concatenate_videoclips(vid_clips, method="compose")
     background_choice = bck_list[0]
     background_vid = VideoFileClip(background_choice)
     background_vid = background_vid.set_duration(vid_dur)
-    segment_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
+    segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
     segment_vid.audio = None
     output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
     segment_vid.write_videofile(output_path)
     del segment_vid
     gc.collect()
+
+    # make video
+    random.shuffle(vid_clips)
+    output_vid = concatenate_videoclips(vid_clips, method="compose")
 
     # get background for today's video
     random.shuffle(bck_list)
