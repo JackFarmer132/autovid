@@ -40,7 +40,7 @@ def auto_upload():
 
     # generate 5 shorts and upload
     for i in range(5):
-        # get time upload will occur (every 3 hours from now)
+        # get time upload will occur (every 2 hours from now)
         time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*2))-1), 0, 0).isoformat() + ".000Z"
         title, upload_vid = make_short()
         # upload the short
