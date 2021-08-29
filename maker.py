@@ -184,7 +184,7 @@ def make_long():
 
     # shuffle background list and any new ones, ensuring one just used isn't used for next week
     used_background = [bck_list.pop(0)]
-    bck_list = update_pickles(used_background, bck_list)
+    bck_list = update_pickles(used_background, BACKGROUND_DIR)
     with open(BCK_PKL, 'wb') as f:
         pickle.dump(bck_list, f)
 
