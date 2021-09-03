@@ -5,6 +5,7 @@ from googleapiclient.http import MediaFileUpload
 import webbrowser
 import socket
 from googleapiclient.errors import HttpError
+from google.auth.exceptions import RefreshError
 
 def auto_upload():
     # configure metadata
@@ -15,10 +16,10 @@ def auto_upload():
     if datetime.datetime.today().weekday() != 6:
         print("making medium video...")
         playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-        title, upload_vid, upload_thumbnail = make_medium()
-        # title = title_generator("medium")
-        # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-        # upload_thumbnail = make_thumbnail()
+        # title, upload_vid, upload_thumbnail = make_medium()
+        title = title_generator("medium")
+        upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+        upload_thumbnail = make_thumbnail()
         youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
     else:
         print("making long video...")
@@ -116,14 +117,10 @@ def youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, t
         vid_nums[vid_type] += 1
         with open(VID_NUM_PKL, 'wb') as f:
             pickle.dump(vid_nums, f)
-    except HttpError as err:
-        # if token is expired, delete it and do this again to remake it
-        if err.resp.status == 400:
-            os.remove(TOKEN)
-            youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, upload_time)
-        # otherwise something else went wrong so stop
-        else:
-            sys.exit(err)
+    except RefreshError as err:
+        print("token expired, please re-instantiate...")
+        os.remove(TOKEN)
+        youtube_upload(vid_type, title, upload_vid, upload_thumbnail, description, tags, playlist_id, upload_time)
 
 
 auto_upload()
