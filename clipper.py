@@ -61,6 +61,3 @@ def clean_chopping_board():
         clip_source(fname, fpath)
         new_fpath = os.path.join(EXPIRED_DIR, fname)
         os.rename(fpath, new_fpath)
-
-
-clean_chopping_board()

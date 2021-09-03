@@ -5,4 +5,4 @@ pyinstaller
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
- 
+pytube3==11.0.1

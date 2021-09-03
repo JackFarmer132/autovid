@@ -16,6 +16,7 @@ CLIP_PKL = os.path.join(PARENT_DIR, "pickles/clips.pkl")
 AUD_PKL = os.path.join(PARENT_DIR, "pickles/audio.pkl")
 THUMB_PKL = os.path.join(PARENT_DIR, "pickles/thumbnails.pkl")
 BCK_PKL = os.path.join(PARENT_DIR, "pickles/backgrounds.pkl")
+TRACKED_CHANNELS_PKL = os.path.join(PARENT_DIR, "pickles/tracked_channels.pkl")
 
 OUTPUT_DIR = os.path.join(PARENT_DIR, "results")
 HOUR_SEGMENTS = os.path.join(OUTPUT_DIR, "hour_segments")

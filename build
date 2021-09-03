@@ -1,11 +1,11 @@
 #!/bin/bash
 cd ..
 pyinstaller --onefile autovid/uploader.py
-pyinstaller --onefile autovid/clipper.py
+pyinstaller --onefile autovid/downloader.py
 rm -r build
 rm uploader.spec
-rm clipper.spec
+rm downloader.spec
 mv -f dist/uploader uploader
-mv -f dist/clipper clipper
+mv -f dist/downloader downloader
 rm -r dist
 echo "new versions built..."

@@ -2,7 +2,6 @@ from conf import *
 import datetime
 import math
 import string
-import pickle
 import cv2
 import random
 import numpy as np
