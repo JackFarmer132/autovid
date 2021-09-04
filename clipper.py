@@ -58,6 +58,9 @@ def clean_chopping_board():
     for fname in os.listdir(CHOPPING_BOARD):
         print("beginning parse of " + fname + "...")
         fpath = os.path.join(CHOPPING_BOARD, fname)
-        clip_source(fname, fpath)
+        if len(os.listdir(FOOD_DIR)) < 500:
+            clip_source(fname, fpath)
+        else:
+            print("food directory full, omitting parse...")
         new_fpath = os.path.join(EXPIRED_DIR, fname)
         os.rename(fpath, new_fpath)

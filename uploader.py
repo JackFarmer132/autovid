@@ -16,10 +16,10 @@ def auto_upload():
     if datetime.datetime.today().weekday() != 6:
         print("making medium video...")
         playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
-        # title, upload_vid, upload_thumbnail = make_medium()
-        title = title_generator("medium")
-        upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-        upload_thumbnail = make_thumbnail()
+        title, upload_vid, upload_thumbnail = make_medium()
+        # title = title_generator("medium")
+        # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
+        # upload_thumbnail = make_thumbnail()
         youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
     else:
         print("making long video...")

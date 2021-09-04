@@ -1,5 +1,6 @@
 from trimmer import *
 import gc
+import pickle
 
 
 # make video with clips with target duration of 10 minutes
@@ -401,7 +402,7 @@ def refill_clips():
 
     food_clips = os.listdir(FOOD_DIR)
     # get number of new clips needed to get back to safe size
-    missing_clips = 1000 - len(vid_list)
+    missing_clips = 500 - len(vid_list)
     # while there are still food clips and they need to be used
     while (missing_clips and food_clips):
         clip = food_clips.pop(0)
