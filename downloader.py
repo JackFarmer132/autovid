@@ -40,6 +40,17 @@ def download_from_targets():
         pickle.dump(tracked_channels, f)
 
 
+def add_new_channel(name, url):
+    # load in current struct
+    with open(TRACKED_CHANNELS_PKL, 'rb') as f:
+        tracked_channels = pickle.load(f)
+    # add new channel
+    tracked_channels[name] = [url, ""]
+    # save
+    with open(TRACKED_CHANNELS_PKL, 'wb') as f:
+        pickle.dump(tracked_channels, f)
+
+
 def auto_download():
     print("beginning downloads...")
     download_from_targets()
@@ -48,3 +59,5 @@ def auto_download():
 
 
 auto_download()
+
+# add_new_channel("", "")
