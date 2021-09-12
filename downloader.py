@@ -26,6 +26,7 @@ def download_from_targets():
                 print("clip was too long, i'm not eating that smh...")
                 continue
             try:
+                print(recent_upload.streams)
                 recent_upload.streams.filter(res="1080p", mime_type="video/mp4").first().download(CHOPPING_BOARD)
             except:
                 print("download failed, moving on...")
