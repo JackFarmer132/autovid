@@ -2,7 +2,11 @@ import os
 import sys
 
 
-PARENT_DIR = "/mnt/h/Personal/projects/autovid"
+exec_path = os.getcwd()
+if "simply_satisfying" in exec_path:
+    PARENT_DIR = "/mnt/h/Personal/projects/simply_satisfying"
+elif "tbd" in exec_path:
+    PARENT_DIR = "/mnt/h/Personal/projects/tbd"
 BASE_DIR = os.path.join(PARENT_DIR, "autovid")
 FOOD_DIR = os.path.join(PARENT_DIR, "food")
 CHOPPING_BOARD = os.path.join(PARENT_DIR, "chopping_board")
