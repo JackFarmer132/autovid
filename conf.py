@@ -5,8 +5,8 @@ import sys
 exec_path = os.getcwd()
 if "simply_satisfying" in exec_path:
     PARENT_DIR = "/mnt/h/Personal/projects/simply_satisfying"
-elif "tbd" in exec_path:
-    PARENT_DIR = "/mnt/h/Personal/projects/tbd"
+elif "animal_fantastical" in exec_path:
+    PARENT_DIR = "/mnt/h/Personal/projects/animal_fantastical"
 BASE_DIR = os.path.join(PARENT_DIR, "autovid")
 FOOD_DIR = os.path.join(PARENT_DIR, "food")
 CHOPPING_BOARD = os.path.join(PARENT_DIR, "chopping_board")
@@ -15,12 +15,13 @@ CLIPS_DIR = os.path.join(PARENT_DIR, "clips")
 AUDIO_DIR = os.path.join(PARENT_DIR, "audio")
 THUMBNAIL_DIR = os.path.join(PARENT_DIR, "thumbnails")
 BACKGROUND_DIR = os.path.join(PARENT_DIR, "backgrounds")
+PKL_DIR = os.path.join(PARENT_DIR, "pickles")
 
-CLIP_PKL = os.path.join(PARENT_DIR, "pickles/clips.pkl")
-AUD_PKL = os.path.join(PARENT_DIR, "pickles/audio.pkl")
-THUMB_PKL = os.path.join(PARENT_DIR, "pickles/thumbnails.pkl")
-BCK_PKL = os.path.join(PARENT_DIR, "pickles/backgrounds.pkl")
-TRACKED_CHANNELS_PKL = os.path.join(PARENT_DIR, "pickles/tracked_channels.pkl")
+CLIP_PKL = os.path.join(PKL_DIR, "clips.pkl")
+AUD_PKL = os.path.join(PKL_DIR, "audio.pkl")
+THUMB_PKL = os.path.join(PKL_DIR, "thumbnails.pkl")
+BCK_PKL = os.path.join(PKL_DIR, "backgrounds.pkl")
+TRACKED_CHANNELS_PKL = os.path.join(PKL_DIR, "tracked_channels.pkl")
 
 OUTPUT_DIR = os.path.join(PARENT_DIR, "results")
 HOUR_SEGMENTS = os.path.join(OUTPUT_DIR, "hour_segments")
