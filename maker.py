@@ -286,7 +286,12 @@ def make_short():
         used_aud_packages.append(clip_package)
 
     # trim to phone size
-    output_vid = output_vid.crop(x1=656, y1=0, x2=1264, y2=1080)
+    (cur_width, _) = output_vid.size
+    total_trim = cur_width - 608
+    left_trim = total_trim / 2
+    right_trim = left_trim + 608
+
+    output_vid = output_vid.crop(x1=left_trim, y1=0, x2=right_trim, y2=1080)
     output_vid = output_vid.fadeout(0.5)
 
     # make audio
