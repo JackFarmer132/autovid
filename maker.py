@@ -256,7 +256,7 @@ def make_short():
     # constructs shorts until over 15 seconds but under 60
     while True:
         # make video over 30 seconds
-        while (vid_dur < 20):
+        while (vid_dur < 15):
             # get front clip
             clip_package = vid_list.pop(0)
             # generate clip from package
@@ -266,9 +266,11 @@ def make_short():
             vid_clips.append(clip)
             used_vid_packages.append(clip_package)
         # if over a minute, try again
-        if (vid_dur >= 31):
+        if (vid_dur >= 25):
             vid_dur = 0
             vid_clips = []
+            vid_list += used_vid_packages
+            used_vid_packages = []
         # if duration is not 0, break out since successful clip
         if vid_dur:
             break
@@ -310,7 +312,7 @@ def make_short():
     output_vid.write_videofile(output_path)
 
     # append used clips to list and save
-    vid_list += used_vid_packages
+    vid_list = update_clips(used_vid_packages, vid_list)
 
     # add audio back to list
     aud_list += used_aud_packages
@@ -475,3 +477,5 @@ def rebuild_pickles(pkl_path, directory):
 # rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
 # rebuild_pickles(AUD_PKL, AUDIO_DIR)
 # rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
+
+make_short()
