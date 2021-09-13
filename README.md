@@ -2,7 +2,7 @@
 A project for automatically creating randomised videos from source clips that are of a fixed length
 
 For proper use, once downloading requirements from the text file, several changes to the moviepy package need to be made.
-Naviagate to venv/lib/python3.8/site-packages/moviepy/audio/fx/all/__init__.py. Change it to the following:
+Naviagate to 'venv/lib/python3.8/site-packages/moviepy/audio/fx/all/__init__.py'. Change it to the following:
 
 ------------------------------------------------------------------------------------------------------------------------------
 import pkgutil
@@ -18,7 +18,7 @@ from moviepy.audio.fx.volumex import volumex
 
 ------------------------------------------------------------------------------------------------------------------------------
 
-Next naviagate to venv/lib/python3.8/site-packages/moviepy/video/fx/all/__init__.py. Change it to the following:
+Next naviagate to 'venv/lib/python3.8/site-packages/moviepy/video/fx/all/__init__.py'. Change it to the following:
 
 ------------------------------------------------------------------------------------------------------------------------------
 import pkgutil
