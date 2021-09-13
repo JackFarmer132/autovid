@@ -428,6 +428,7 @@ def refill_clips():
 def update_clips(used_clips, pickle_clips):
     # get a list of clips in the food dir
     food_clips = os.listdir(FOOD_DIR)
+    random.shuffle(food_clips)
     # only exchange clips if there are any new ones to be eaten
     if food_clips:
         for i in range(len(list(used_clips))):
@@ -477,5 +478,3 @@ def rebuild_pickles(pkl_path, directory):
 # rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
 # rebuild_pickles(AUD_PKL, AUDIO_DIR)
 # rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
-
-make_medium()
