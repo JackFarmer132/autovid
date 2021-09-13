@@ -478,4 +478,4 @@ def rebuild_pickles(pkl_path, directory):
 # rebuild_pickles(AUD_PKL, AUDIO_DIR)
 # rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
 
-make_short()
+make_medium()

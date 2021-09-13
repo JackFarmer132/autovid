@@ -38,7 +38,7 @@ def find_border_length(image):
                 pixel_colours.append(image.getpixel((x,y)))
         # add for safety (better to trim too much than too little)
         x += 10
-        if x < 656:
+        if x < int(((image.width-608)/2)):
             cur_border = max(cur_border, x)
         # print("=====================")
     return cur_border
@@ -52,8 +52,8 @@ def get_borders(base_frame):
     right_border = find_border_length(base_frame)
     # fix any errors
     if (not left_border) and (not right_border):
-        left_border = 500
-        right_border = 500
+        left_border = int(((base_frame.width-608)/2))
+        right_border = left_border
     # helps catch when one border is very off for whatever reason
     if abs(left_border - right_border) >= 100:
         left_diff = abs(400 - left_border)
