@@ -15,6 +15,7 @@ from moviepy.audio.fx.audio_left_right import audio_left_right
 from moviepy.audio.fx.audio_loop import audio_loop
 from moviepy.audio.fx.audio_normalize import audio_normalize
 from moviepy.audio.fx.volumex import volumex
+
 ------------------------------------------------------------------------------------------------------------------------------
 
 Next naviagate to venv/lib/python3.8/site-packages/moviepy/video/fx/all/__init__.py. Change it to the following:
@@ -54,6 +55,7 @@ from moviepy.video.fx.speedx import speedx
 from moviepy.video.fx.supersample import supersample
 from moviepy.video.fx.time_mirror import time_mirror
 from moviepy.video.fx.time_symmetrize import time_symmetrize
+
 ------------------------------------------------------------------------------------------------------------------------------
 This needs to be done to allow the build script to correctly convert the py files to executable binaries. 
 
