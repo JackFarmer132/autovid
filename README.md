@@ -9,12 +9,12 @@ import pkgutil
 
 import moviepy.audio.fx as fx
 
-from moviepy.audio.fx.audio_fadein import audio_fadein
-from moviepy.audio.fx.audio_fadeout import audio_fadeout
-from moviepy.audio.fx.audio_left_right import audio_left_right
-from moviepy.audio.fx.audio_loop import audio_loop
-from moviepy.audio.fx.audio_normalize import audio_normalize
-from moviepy.audio.fx.volumex import volumex
+from moviepy.audio.fx.audio_fadein import audio_fadein\n
+from moviepy.audio.fx.audio_fadeout import audio_fadeout\n
+from moviepy.audio.fx.audio_left_right import audio_left_right\n
+from moviepy.audio.fx.audio_loop import audio_loop\n
+from moviepy.audio.fx.audio_normalize import audio_normalize\n
+from moviepy.audio.fx.volumex import volumex\n
 
 ------------------------------------------------------------------------------------------------------------------------------
 
