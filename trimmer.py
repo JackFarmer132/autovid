@@ -55,7 +55,7 @@ def get_borders(base_frame):
         left_border = int(((base_frame.width-608)/2))
         right_border = left_border
     # helps catch when one border is very off for whatever reason
-    if abs(left_border - right_border) >= 100:
+    if abs(left_border - right_border) >= 60:
         left_diff = abs(400 - left_border)
         right_diff = abs(400 - right_border)
         if left_diff > right_diff:
