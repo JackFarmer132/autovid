@@ -405,17 +405,17 @@ def satisfying_title_generator(vid_type):
 # used for video titles that need to be click-baity
 def animal_title_generator(vid_type):
     exclamation= [
-        "So Cute! ",
-        "Cute! ",
-        "So Funny! ",
-        "Awww! ",
-        "Wow! ",
-        "Incredible! ",
-        "Super Cute! ",
-        "Super Funny! ",
+        "SO CUTE! ",
+        "CUTE! ",
+        "SO FUNNY! ",
+        "AWWWW! ",
+        "WOW! ",
+        "AMAZING! ",
+        "SUPER CUTE! ",
+        "SUPER FUNNY! ",
         "",
-        "Adorable! ",
-        "So Precious! ",
+        "ADORABLE! ",
+        "SO PRECIOUS! ",
     ]
 
     prefixes = [
