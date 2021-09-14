@@ -48,19 +48,25 @@ def make_medium():
         vid_clips.append(clip)
         used_vid_packages.append(clip_package)
 
-    # shake them up for the hour long segment
-    random.shuffle(vid_clips)
-    # make segment clip for the hour long vid
-    segment_vid = concatenate_videoclips(vid_clips, method="compose")
-    background_choice = bck_list[0]
-    background_vid = VideoFileClip(background_choice)
-    background_vid = background_vid.set_duration(vid_dur)
-    segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
-    segment_vid.audio = None
-    output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
-    segment_vid.write_videofile(output_path)
-    del segment_vid
-    gc.collect()
+    # only run this for simply satisfying (only channel to do hour longs)
+    if "simply_satisfying" in exec_path:
+        random.shuffle(vid_clips)
+        # make segment clip for the hour long vid
+        segment_vid = concatenate_videoclips(vid_clips, method="compose")
+        background_choice = bck_list[0]
+        background_vid = VideoFileClip(background_choice)
+        background_vid = background_vid.set_duration(vid_dur)
+        segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
+        segment_vid.audio = None
+        output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
+        segment_vid.write_videofile(output_path)
+        del segment_vid
+        gc.collect()
+        # make title here
+        title = satisfying_title_generator("medium")
+    # otherwise is another channel so just get the title
+    elif "everything_animal" in exec_path:
+        title = animal_title_generator("medium")
 
     # make video
     random.shuffle(vid_clips)
@@ -100,9 +106,16 @@ def make_medium():
 
     # if new food, get rid of used clips and replace with new ones, else just append
     vid_list = update_clips(used_vid_packages, vid_list)
+    # if a sunday, shuffle the clips
+    if datetime.datetime.today().weekday() != 6:
+        random.shuffle(vid_list)
 
     # add audio back to list
     aud_list = update_pickles(used_aud_packages, AUDIO_DIR)
+
+    # if a sunday and in here, shuffle
+    if (datetime.datetime.today().weekday() == 6):
+        random.shuffle(vid_list)
 
     # save with pickle
     with open(CLIP_PKL, 'wb') as f:
@@ -111,7 +124,7 @@ def make_medium():
     with open(AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (title_generator("medium"), output_path, make_thumbnail())
+    return (title, output_path, make_thumbnail())
 
 
 # make video with clips with target duration of 10 minutes
@@ -189,7 +202,7 @@ def make_long():
     with open(BCK_PKL, 'wb') as f:
         pickle.dump(bck_list, f)
 
-    return (title_generator("long"), output_path, make_thumbnail())
+    return (satisfying_title_generator("long"), output_path, make_thumbnail())
 
 
 def make_thumbnail():
@@ -311,6 +324,12 @@ def make_short():
     output_path = os.path.join(OUTPUT_DIR, "new_short.mp4")
     output_vid.write_videofile(output_path)
 
+    # get title
+    if "simply_satisfying" in exec_path:
+        title = satisfying_title_generator("short")
+    elif "everything_animal" in exec_path:
+        title = animal_title_generator("short")
+
     # append used clips to list and save
     vid_list = update_clips(used_vid_packages, vid_list)
 
@@ -324,7 +343,7 @@ def make_short():
     with open(AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
 
-    return (title_generator("short"), output_path)
+    return (title, output_path)
 
 
 # makes random names for things since they don't matter
@@ -332,7 +351,7 @@ def random_file_name_generator(size=10, chars=string.ascii_uppercase + string.di
     return ''.join(random.choice(chars) for _ in range(size))
 
 # used for video titles that need to be click-baity
-def title_generator(vid_type):
+def satisfying_title_generator(vid_type):
     prefixes = ["Simply",
                 "Strangely",
                 "Super",
@@ -381,6 +400,69 @@ def title_generator(vid_type):
         return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
     else:
         return "1 Hour " + random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
+
+
+# used for video titles that need to be click-baity
+def animal_title_generator(vid_type):
+    exclamation= [
+        "So Cute! ",
+        "Cute! ",
+        "So Funny! ",
+        "Awww! ",
+        "Wow! ",
+        "Incredible! ",
+        "Super Cute! ",
+        "Super Funny! ",
+        "",
+        "Adorable! ",
+        "So Precious! ",
+    ]
+
+    prefixes = [
+        "Cute ",
+        "Funny ",
+        "Amazing ",
+        "Adorable ",
+        "Cutest ",
+        "Funniest ",
+        "Furriest ",
+        "Best ",
+        "More ",
+        "Paw-some ",
+        "Prettiest ",
+    ]
+
+    subjects = [
+        "Pets ",
+        "Animals ",
+    ]
+
+    suffixes = [
+        "That Will Make You Smile",
+        "That Will Make You Laugh",
+        "For Helping You Relax",
+        "For Every Animal Lover",
+        "For Every Pet Lover",
+        "That Get Rid Of Stress",
+        "To Get Rid Of Stress",
+        "That Help You Relax",
+        "That Help You Relax At Night",
+        "That Help You Smile",
+        "That Help You Laugh",
+        "That Make You Warm And Fuzzy",
+        "That Make You Say Awww",
+    ]
+
+    # read in vid numbers
+    with open(VID_NUM_PKL, 'rb') as f:
+        num_dict = pickle.load(f)
+
+    vid_num = str(num_dict[vid_type] + 1)
+
+    if vid_type == "medium":
+        return random.choice(exclamation) + random.choice(prefixes) + random.choice(subjects) + random.choice(suffixes) + " | #" + vid_num
+    else:
+        return random.choice(exclamation) + random.choice(prefixes) + "Animal Shorts " + random.choice(suffixes) + " | #" + vid_num
 
 
 def check_pickle_integrity(directory, pkl_path):

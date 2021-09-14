@@ -9,31 +9,41 @@ from google.auth.exceptions import RefreshError
 
 def auto_upload():
     # configure metadata
-    description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #slime #asmr"
-    tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
+    if "simply_satisfying" in exec_path:
+        vid_description = "Welcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #slime #asmr"
+        vid_tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
+        medium_playlist = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
+        long_playlist = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
+        short_description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
+        short_tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr"]
+        short_playlist = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
+        condition = (datetime.datetime.today().weekday() != 6)
+    elif "everything_animal" in exec_path:
+        vid_description = "Welcome to Everything Animal! \n\nWe post the cutest and funniest animal videos that we can find! \nWhether it's cats, dogs or other amazing animals, the cutest clips can be found right here! \n Please like and subscribe and let us know what you though of the video! \n\n#animals #pets #cute #funny"
+        vid_tags = ["cute", "relaxing", "funny", "animals", "asmr", "pets"]
+        medium_playlist = "PL21fniLIdL1sk0QHt2xZMZ_BYWow2gN_M"
+        short_description = "#shorts\nWelcome to Everything Animal! \n\nWe post the cutest and funniest animal videos that we can find! \nWhether it's cats, dogs or other amazing animals, the cutest clips can be found right here! \n Please like and subscribe and let us know what you though of the video! \n\n#animals #pets #cute #funny"
+        short_tags = ["shorts", "cute", "relaxing", "funny", "animals", "asmr", "pets"]
+        short_playlist = "PL21fniLIdL1tX0pmBEkurzawFeOoqfrcu"
+        condition = True
 
-    # if not a sunday, upload regular 10 min vid and 3 shorts, else 1hr and shorts
-    if datetime.datetime.today().weekday() != 6:
+    if condition:
         print("making medium video...")
-        playlist_id = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
         title, upload_vid, upload_thumbnail = make_medium()
-        # title = title_generator("medium")
+        # if "simply_satisfying" in exec_path:
+        #     title = satisfying_title_generator("medium")
+        # elif "everything_animal" in exec_path:
+        #     title = animal_title_generator("medium")
         # upload_vid = os.path.join(OUTPUT_DIR, "new_vid.mp4")
         # upload_thumbnail = make_thumbnail()
-        youtube_upload("medium", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
+        youtube_upload("medium", title, upload_vid, upload_thumbnail, vid_description, vid_tags, medium_playlist, None)
     else:
         print("making long video...")
-        playlist_id = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
         title, upload_vid, upload_thumbnail = make_long()
-        # title = title_generator("long")
+        # title = satisfying_title_generator("long")
         # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
         # upload_thumbnail = make_thumbnail()
-        youtube_upload("long", title, upload_vid, upload_thumbnail, description, tags, playlist_id, None)
-
-    # configure metadata for shorts
-    description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
-    tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr"]
-    playlist_id = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
+        youtube_upload("long", title, upload_vid, upload_thumbnail, vid_description, vid_tags, long_playlist, None)
 
     # get current time for scheduling uploads
     now = datetime.datetime.now()
@@ -45,7 +55,7 @@ def auto_upload():
         time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*2))-1), 0, 0).isoformat() + ".000Z"
         title, upload_vid = make_short()
         # upload the short
-        youtube_upload("short", title, upload_vid, None, description, tags, playlist_id, time)
+        youtube_upload("short", title, upload_vid, None, short_description, short_tags, short_playlist, time)
     print("done!")
 
 
