@@ -55,13 +55,15 @@ def get_borders(base_frame):
         left_border = int(((base_frame.width-608)/2))
         right_border = left_border
     # helps catch when one border is very off for whatever reason
-    if abs(left_border - right_border) >= 40:
-        left_diff = abs(400 - left_border)
-        right_diff = abs(400 - right_border)
-        if left_diff > right_diff:
-            left_border = right_border
-        else:
-            right_border = left_border
+    if abs(left_border - right_border) >= 100:
+        new_border = max(left_border, right_border)
+        # set border to be largest of two, so long as it doesn't exceed max trim
+        if new_border > int(((base_frame.width-608)/2)):
+            new_border = min(left_border, right_border)
+            if new_border > int(((base_frame.width-608)/2)):
+                new_border = int(((base_frame.width-608)/2))
+        left_border = new_border
+        right_border = new_border
 
     # apparently you can't have an odd-numbered width, so fix that here
     if ((left_border + right_border) % 2) == 1:
