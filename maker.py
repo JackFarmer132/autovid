@@ -253,10 +253,6 @@ def make_short():
     with open(AUD_PKL, 'rb') as f:
         aud_list = pickle.load(f)
 
-    # read in background list
-    with open(BCK_PKL, 'rb') as f:
-        bck_list = pickle.load(f)
-
     # reading from head, construct video until duration is 10 minutes
     vid_clips = []
     aud_clips = []
@@ -556,7 +552,7 @@ def rebuild_pickles(pkl_path, directory):
     with open(pkl_path, 'wb') as f:
         pickle.dump(new_pkl, f)
 
-# rebuild_pickles(CLIP_PKL, CLIPS_DIR)
-# rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
-# rebuild_pickles(AUD_PKL, AUDIO_DIR)
-# rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
+rebuild_pickles(CLIP_PKL, CLIPS_DIR)
+rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
+rebuild_pickles(AUD_PKL, AUDIO_DIR)
+rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)

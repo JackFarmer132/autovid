@@ -38,7 +38,7 @@ def find_border_length(image):
                 pixel_colours.append(image.getpixel((x,y)))
         # add for safety (better to trim too much than too little)
         x += 10
-        if x < int(((image.width-608)/2)):
+        if x < (10+int(((image.width-608)/2))):
             cur_border = max(cur_border, x)
         # print("=====================")
     return cur_border
@@ -48,20 +48,22 @@ def get_borders(base_frame):
     # get first frame and blur it
     base_frame = Image.fromarray(cv2.blur(base_frame, (15,15)))
     left_border = find_border_length(base_frame)
+    time.sleep(3)
     base_frame = base_frame.transpose(Image.FLIP_LEFT_RIGHT)
+    base_frame.save(os.path.join(OUTPUT_DIR, "temp.jpg"))
     right_border = find_border_length(base_frame)
     # fix any errors
     if (not left_border) and (not right_border):
-        left_border = int(((base_frame.width-608)/2))
+        left_border = (10+int(((base_frame.width-608)/2)))
         right_border = left_border
     # helps catch when one border is very off for whatever reason
     if abs(left_border - right_border) >= 100:
         new_border = max(left_border, right_border)
         # set border to be largest of two, so long as it doesn't exceed max trim
-        if new_border > int(((base_frame.width-608)/2)):
+        if new_border > (10+int(((base_frame.width-608)/2))):
             new_border = min(left_border, right_border)
-            if new_border > int(((base_frame.width-608)/2)):
-                new_border = int(((base_frame.width-608)/2))
+            if new_border > (10+int(((base_frame.width-608)/2))):
+                new_border = (10+int(((base_frame.width-608)/2)))
         left_border = new_border
         right_border = new_border
 
