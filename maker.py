@@ -199,6 +199,7 @@ def make_long():
     # shuffle background list and any new ones, ensuring one just used isn't used for next week
     used_background = [bck_list.pop(0)]
     bck_list = update_pickles(used_background, BACKGROUND_DIR)
+
     with open(BCK_PKL, 'wb') as f:
         pickle.dump(bck_list, f)
 
@@ -552,7 +553,7 @@ def rebuild_pickles(pkl_path, directory):
     with open(pkl_path, 'wb') as f:
         pickle.dump(new_pkl, f)
 
-rebuild_pickles(CLIP_PKL, CLIPS_DIR)
-rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
-rebuild_pickles(AUD_PKL, AUDIO_DIR)
-rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
+# rebuild_pickles(CLIP_PKL, CLIPS_DIR)
+# rebuild_pickles(BCK_PKL, BACKGROUND_DIR)
+# rebuild_pickles(AUD_PKL, AUDIO_DIR)
+# rebuild_pickles(THUMB_PKL, THUMBNAIL_DIR)
