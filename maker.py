@@ -48,36 +48,36 @@ def make_medium():
         vid_clips.append(clip)
         used_vid_packages.append(clip_package)
 
-    # only run this for simply satisfying (only channel to do hour longs)
-    if "simply_satisfying" in exec_path:
-        random.shuffle(vid_clips)
-        # make segment clip for the hour long vid
-        segment_vid = concatenate_videoclips(vid_clips, method="compose")
-        background_choice = bck_list[0]
-        background_vid = VideoFileClip(background_choice)
-        background_vid = background_vid.set_duration(vid_dur)
-        segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
-        segment_vid.audio = None
-        output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
-        segment_vid.write_videofile(output_path)
-        del segment_vid
-        gc.collect()
-        # make title here
-        title = satisfying_title_generator("medium")
-    # otherwise is another channel so just get the title
-    elif "everything_animal" in exec_path:
-        title = animal_title_generator("medium")
-
-    # make video
+    # make segment for 1 hour version on weekend
     random.shuffle(vid_clips)
-    output_vid = concatenate_videoclips(vid_clips, method="compose")
+    # make segment clip for the hour long vid
+    segment_vid = concatenate_videoclips(vid_clips)
+    background_choice = bck_list[0]
+    background_vid = VideoFileClip(background_choice)
+    background_vid = background_vid.set_duration(vid_dur)
+    segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
+    segment_vid.audio = None
+    output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
+    segment_vid.write_videofile(output_path)
+    del segment_vid
+    gc.collect()
+
+    # make actual video
+    random.shuffle(vid_clips)
+    output_vid = concatenate_videoclips(vid_clips)
+
+    # get like and sub clip to put in intro
+    subscribe_clip = VideoFileClip(LIKE_AND_SUBSCRIBE)
+    subscribe_clip.audio = None
+    subscribe_clip = subscribe_clip.fx(vfx.mask_color, color=[0, 255, 8], thr=100, s=5)
+    subscribe_clip = subscribe_clip.resize(0.3).set_position(('center',0.77), relative=True)
 
     # get background for today's video
     random.shuffle(bck_list)
     background_choice = bck_list[0]
     background_vid = VideoFileClip(background_choice)
     background_vid = background_vid.set_duration(vid_dur)
-    output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center")])
+    output_vid = CompositeVideoClip([background_vid, output_vid.set_position("center"), subscribe_clip])
     output_vid = output_vid.fadeout(1)
 
     # constructs audio backing that fits at least the vid length
@@ -106,16 +106,9 @@ def make_medium():
 
     # if new food, get rid of used clips and replace with new ones, else just append
     vid_list = update_clips(used_vid_packages, vid_list)
-    # if a sunday, shuffle the clips
-    if datetime.datetime.today().weekday() != 6:
-        random.shuffle(vid_list)
 
     # add audio back to list
     aud_list = update_pickles(used_aud_packages, AUDIO_DIR)
-
-    # if a sunday and in here, shuffle
-    if (datetime.datetime.today().weekday() == 6):
-        random.shuffle(vid_list)
 
     # save with pickle
     with open(CLIP_PKL, 'wb') as f:
@@ -123,6 +116,12 @@ def make_medium():
 
     with open(AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
+
+    # get title
+    if "simply_satisfying" in exec_path:
+        title = satisfying_title_generator("medium")
+    elif "everything_animal" in exec_path:
+        title = animal_title_generator("medium")
 
     return (title, output_path, make_thumbnail())
 
@@ -159,8 +158,18 @@ def make_long():
     # leave it to fate to pick a good openning clip
     random.shuffle(segments)
 
+    # get first vid and put on sub video
+    subscribe_clip = VideoFileClip(LIKE_AND_SUBSCRIBE)
+    subscribe_clip.audio = None
+    subscribe_clip = subscribe_clip.fx(vfx.mask_color, color=[0, 255, 8], thr=100, s=5)
+    subscribe_clip = subscribe_clip.resize(0.3).set_position(('center',0.77), relative=True)
+
+    front_clip = segments.pop(0)
+    front_clip = CompositeVideoClip([front_clip, subscribe_clip])
+    segments = [front_clip] + segments
+
     # make video
-    output_vid = concatenate_videoclips(segments, method="compose")
+    output_vid = concatenate_videoclips(segments)
     output_vid = output_vid.fadeout(1)
 
     # audio things
@@ -203,7 +212,13 @@ def make_long():
     with open(BCK_PKL, 'wb') as f:
         pickle.dump(bck_list, f)
 
-    return (satisfying_title_generator("long"), output_path, make_thumbnail())
+    # get title
+    if "simply_satisfying" in exec_path:
+        title = satisfying_title_generator("long")
+    elif "everything_animal" in exec_path:
+        title = animal_title_generator("long")
+
+    return (title, output_path, make_thumbnail())
 
 
 def make_thumbnail():
@@ -286,7 +301,7 @@ def make_short():
             break
 
     # make video
-    output_vid = concatenate_videoclips(vid_clips, method="compose")
+    output_vid = concatenate_videoclips(vid_clips)
 
     # constructs audio backing that fits at least the vid length
     while (aud_dur < vid_dur):
@@ -321,12 +336,6 @@ def make_short():
     output_path = os.path.join(OUTPUT_DIR, "new_short.mp4")
     output_vid.write_videofile(output_path)
 
-    # get title
-    if "simply_satisfying" in exec_path:
-        title = satisfying_title_generator("short")
-    elif "everything_animal" in exec_path:
-        title = animal_title_generator("short")
-
     # append used clips to list and save
     vid_list = update_clips(used_vid_packages, vid_list)
 
@@ -339,6 +348,12 @@ def make_short():
 
     with open(AUD_PKL, 'wb') as f:
         pickle.dump(aud_list, f)
+
+    # get title
+    if "simply_satisfying" in exec_path:
+        title = satisfying_title_generator("short")
+    elif "everything_animal" in exec_path:
+        title = animal_title_generator("short")
 
     return (title, output_path)
 
@@ -354,7 +369,6 @@ def satisfying_title_generator(vid_type):
                 "Super",
                 "Amazingly",
                 "Relaxing",
-                "Interesting",
                 "Incredibly",
                 "Extra",
                 "Crazy",
@@ -456,10 +470,12 @@ def animal_title_generator(vid_type):
 
     vid_num = str(num_dict[vid_type] + 1)
 
-    if vid_type == "medium":
+    if vid_type == "short":
+        return random.choice(exclamation) + random.choice(prefixes) + "Animal Shorts " + random.choice(suffixes) + " | #" + vid_num
+    elif vid_type == "medium":
         return random.choice(exclamation) + random.choice(prefixes) + random.choice(subjects) + random.choice(suffixes) + " | #" + vid_num
     else:
-        return random.choice(exclamation) + random.choice(prefixes) + "Animal Shorts " + random.choice(suffixes) + " | #" + vid_num
+        return random.choice(exclamation) + "1 HOUR " + random.choice(prefixes) + random.choice(subjects) + random.choice(suffixes) + " | #" + vid_num
 
 
 def check_pickle_integrity(directory, pkl_path):

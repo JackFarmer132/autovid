@@ -49,7 +49,6 @@ def get_borders(base_frame):
     base_frame = Image.fromarray(cv2.blur(base_frame, (15,15)))
     left_border = find_border_length(base_frame)
     base_frame = base_frame.transpose(Image.FLIP_LEFT_RIGHT)
-    base_frame.save(os.path.join(OUTPUT_DIR, "temp.jpg"))
     right_border = find_border_length(base_frame)
     # fix any errors
     if (not left_border) and (not right_border):

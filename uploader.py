@@ -17,17 +17,16 @@ def auto_upload():
         short_description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
         short_tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr"]
         short_playlist = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
-        condition = (datetime.datetime.today().weekday() != 6)
     elif "everything_animal" in exec_path:
         vid_description = "Welcome to Everything Animal! \n\nWe post the cutest and funniest animal videos that we can find! \nWhether it's cats, dogs or other amazing animals, the cutest clips can be found right here! \n Please like and subscribe and let us know what you though of the video! \n\n#animals #pets #cute #funny"
         vid_tags = ["cute", "relaxing", "funny", "animals", "asmr", "pets"]
         medium_playlist = "PL21fniLIdL1sk0QHt2xZMZ_BYWow2gN_M"
+        long_playlist = "PL21fniLIdL1v6O2mLD2088-pSAz6PrJl_"
         short_description = "#shorts\nWelcome to Everything Animal! \n\nWe post the cutest and funniest animal videos that we can find! \nWhether it's cats, dogs or other amazing animals, the cutest clips can be found right here! \n Please like and subscribe and let us know what you though of the video! \n\n#animals #pets #cute #funny"
         short_tags = ["shorts", "cute", "relaxing", "funny", "animals", "asmr", "pets"]
         short_playlist = "PL21fniLIdL1tX0pmBEkurzawFeOoqfrcu"
-        condition = True
 
-    if condition:
+    if (datetime.datetime.today().weekday() != 6):
         print("making medium video...")
         title, upload_vid, upload_thumbnail = make_medium()
         # if "simply_satisfying" in exec_path:
@@ -40,7 +39,10 @@ def auto_upload():
     else:
         print("making long video...")
         title, upload_vid, upload_thumbnail = make_long()
-        # title = satisfying_title_generator("long")
+        # if "simply_satisfying" in exec_path:
+        #     title = satisfying_title_generator("long")
+        # elif "everything_animal" in exec_path:
+        #     title = animal_title_generator("long")
         # upload_vid = os.path.join(OUTPUT_DIR, "new_hour.mp4")
         # upload_thumbnail = make_thumbnail()
         youtube_upload("long", title, upload_vid, upload_thumbnail, vid_description, vid_tags, long_playlist, None)
