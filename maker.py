@@ -1,6 +1,7 @@
 from trimmer import *
 import gc
 import pickle
+import multiprocessing
 
 
 # make video with clips with target duration of 10 minutes
@@ -58,7 +59,7 @@ def make_medium():
     segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
     segment_vid.audio = None
     output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
-    segment_vid.write_videofile(output_path)
+    segment_vid.write_videofile(output_path, threads=12)
     del segment_vid
     gc.collect()
 
@@ -102,7 +103,7 @@ def make_medium():
     # combine video and audio
     output_vid.audio = output_aud
     output_path = os.path.join(OUTPUT_DIR, "new_vid.mp4")
-    output_vid.write_videofile(output_path)
+    output_vid.write_videofile(output_path, threads=12)
 
     # if new food, get rid of used clips and replace with new ones, else just append
     vid_list = update_clips(used_vid_packages, vid_list)
@@ -198,7 +199,7 @@ def make_long():
     # combine video and audio
     output_vid.audio = output_aud
     output_path = os.path.join(OUTPUT_DIR, "new_hour.mp4")
-    output_vid.write_videofile(output_path)
+    output_vid.write_videofile(output_path, threads=12)
 
     # shuffle vid clips for following week and save
     random.shuffle(vid_list)
@@ -319,6 +320,8 @@ def make_short():
     right_trim = left_trim + 608
 
     output_vid = output_vid.crop(x1=left_trim, y1=0, x2=right_trim, y2=1080)
+    # get rid of last frame as can cause issues
+    output_vid = output_vid.subclip(t_end=(output_vid.duration - 1.0/output_vid.fps))
     output_vid = output_vid.fadeout(0.5)
 
     # make audio
@@ -334,7 +337,7 @@ def make_short():
     # combine video and audio
     output_vid.audio = output_aud
     output_path = os.path.join(OUTPUT_DIR, "new_short.mp4")
-    output_vid.write_videofile(output_path)
+    output_vid.write_videofile(output_path, threads=12)
 
     # append used clips to list and save
     vid_list = update_clips(used_vid_packages, vid_list)
