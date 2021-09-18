@@ -153,8 +153,8 @@ def make_long():
     segments = []
 
     # go through and collect the 6 videos for making the hour one
-    for i in range(6):
-        segments.append(VideoFileClip(os.path.join(HOUR_SEGMENTS, "segment_" + str(i) + ".mp4")))
+    for segment in os.listdir(HOUR_SEGMENTS):
+        segments.append(VideoFileClip(os.path.join(HOUR_SEGMENTS, segment)))
 
     # leave it to fate to pick a good openning clip
     random.shuffle(segments)

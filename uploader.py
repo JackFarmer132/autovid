@@ -14,6 +14,7 @@ def auto_upload():
         vid_tags = ["satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr", "slime"]
         medium_playlist = "PLxti3LVGtcTmtdqRYdbgwB84Ty7cpRGq9"
         long_playlist = "PLxti3LVGtcTnmmxJgRTfRqshZdVRnZdXq"
+        long_upload_day = 6
         short_description = "#shorts\nWelcome to Simply Satisfying! \n\nHere we post the most satisfying content we can find! \nFrom Slime Videos to Soap Cutting, the most satisfying videos can be found here! \nPlease like and subscribe and please let us know what you thought of the video!\n\n#satisfying #oddlysatisfying #asmr"
         short_tags = ["shorts", "satisfying", "relaxing", "simplysatisfying", "oddlysatisfying", "asmr"]
         short_playlist = "PLxti3LVGtcTl501sFuIO0JoYHSKa4H6gD"
@@ -22,11 +23,12 @@ def auto_upload():
         vid_tags = ["cute", "relaxing", "funny", "animals", "asmr", "pets"]
         medium_playlist = "PL21fniLIdL1sk0QHt2xZMZ_BYWow2gN_M"
         long_playlist = "PL21fniLIdL1v6O2mLD2088-pSAz6PrJl_"
+        long_upload_day = 5
         short_description = "#shorts\nWelcome to Everything Animal! \n\nWe post the cutest and funniest animal videos that we can find! \nWhether it's cats, dogs or other amazing animals, the cutest clips can be found right here! \n Please like and subscribe and let us know what you though of the video! \n\n#animals #pets #cute #funny"
         short_tags = ["shorts", "cute", "relaxing", "funny", "animals", "asmr", "pets"]
         short_playlist = "PL21fniLIdL1tX0pmBEkurzawFeOoqfrcu"
 
-    if (datetime.datetime.today().weekday() != 6):
+    if (datetime.datetime.today().weekday() != long_upload_day):
         print("making medium video...")
         title, upload_vid, upload_thumbnail = make_medium()
         # if "simply_satisfying" in exec_path:
