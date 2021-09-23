@@ -413,7 +413,7 @@ def satisfying_title_generator(vid_type):
     elif vid_type == "medium":
         return random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
     else:
-        return "1 Hour " + random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
+        return "1 HOUR " + random.choice(prefixes) + " Satisfying Videos " + random.choice(suffixes) + " | #" + vid_num
 
 
 # used for video titles that need to be click-baity

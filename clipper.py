@@ -7,26 +7,24 @@ def clip_source(fname, fpath):
 
     prev_borders = ()
     threshold = 2
-    total_dur = -0.2
     subclip_start = 0
     subclip_times = []
     # progress bar things
     seconds_per_bar = round(int(clip.duration)/100, 1)
-    cur_percent = 0
+    cur_percent = -0.4
     print("|", end="", flush=True)
 
     for i in range(int(clip.duration/2)*5):
         time = round((i*0.4), 1)
         frame = clip.get_frame(time)
-        total_dur = round((total_dur+0.4),1)
         cur_percent += 0.4
         if prev_borders:
             cur_borders = get_borders(frame)
             # if borders are different, then new clip has started
             if (abs(cur_borders[0]-prev_borders[0])>threshold) and (abs(cur_borders[1]-prev_borders[1])>threshold):
-                # print("at time " + str(round(total_dur,5)))
-                subclip_times.append((subclip_start, (total_dur-0.6)))
-                subclip_start = total_dur + 0.1
+                # print("at time " + str(round(time,5)))
+                subclip_times.append((subclip_start, (time-0.8)))
+                subclip_start = time + 0.2
             # update
             prev_borders = cur_borders
         else:

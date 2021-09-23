@@ -63,7 +63,7 @@ Once this is done, run 'python -m pip install --upgrade pytube' to ensure the co
 
 To optimize even more, follow this: https://github.com/Zulko/moviepy/issues/1145
 
-In case it's missing, navigate to 'venv/lib/python3.8/site-packages/moviepy/video/compositing/CompositeVideoClip.py-CompositeVideoClip' and change the make_frame function:
+In case it's missing, navigate to 'venv/lib/python3.8/site-packages/moviepy/video/compositing/CompositeVideoClip.py-CompositeVideoClip', add 'from PIL import Image', and change the make_frame function:
 
 ------------------------------------------------------------------------------------------------------------------------------
 def make_frame(t):
