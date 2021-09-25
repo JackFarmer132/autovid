@@ -44,6 +44,11 @@ def clip_source(fname, fpath):
         # if clip is invalid size, don't make it
         if ((subclip_end - subclip_start) >= 4) and ((subclip_end - subclip_start) <= 60):
             subclip = clip.subclip(subclip_start, subclip_end)
+            # give black background to guarantee 1080x1920 size
+            if subclip.size[0] != 1920:
+                background = VideoFileClip(BLACK_BACKGROUND)
+                background = background.set_duration(subclip.duration)
+                subclip = CompositeVideoClip([background, subclip.set_position("center")])
             subclip.audio = None
             subclip = subclip.set_fps(round(subclip.fps))
             output_path = os.path.join(FOOD_DIR, fname + "_" + str(i) + ".mp4")

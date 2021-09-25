@@ -13,6 +13,7 @@ def setup_dirs():
     os.mkdir(OUTPUT_DIR)
     os.mkdir(HOUR_SEGMENTS)
     os.mkdir(EXPIRED_DIR)
+    os.mkdir(UTILS_DIR)
 
 
 def setup_pickles():
