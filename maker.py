@@ -539,7 +539,8 @@ def update_clips(used_clips, pickle_clips):
                 # get rid of a used clip
                 used_clip_path = used_clips.pop(0)
                 # delete this old clip
-                os.rename(used_clip_path, os.path.join(EXPIRED_DIR, (random_file_name_generator() + ".mp4")))
+                # os.rename(used_clip_path, os.path.join(EXPIRED_DIR, (random_file_name_generator() + ".mp4")))
+                os.remove(used_clip_path)
                 # add new clip to this thing
                 used_clips.append(new_clip_path)
                 # move new clip to the clip directory

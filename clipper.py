@@ -66,4 +66,5 @@ def clean_chopping_board():
         else:
             print("food directory full, omitting parse...")
         new_fpath = os.path.join(EXPIRED_DIR, fname)
-        os.rename(fpath, new_fpath)
+        # os.rename(fpath, new_fpath)
+        os.remove(fpath)
