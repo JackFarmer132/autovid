@@ -52,7 +52,10 @@ def clip_source(fname, fpath):
             subclip.audio = None
             subclip = subclip.set_fps(round(subclip.fps))
             output_path = os.path.join(FOOD_DIR, fname + "_" + str(i) + ".mp4")
-            subclip.write_videofile(output_path)
+            try:
+                subclip.write_videofile(output_path)
+            except:
+                pass
         gc.collect()
 
 
