@@ -56,7 +56,7 @@ def auto_upload():
     # generate 5 shorts and upload
     for i in range(5):
         # get time upload will occur (every 2 hours from now)
-        time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*2))-1), 0, 0).isoformat() + ".000Z"
+        time = datetime.datetime(now.year, now.month, now.day, ((now.hour + ((i+1)*2))), 0, 0).isoformat() + ".000Z"
         title, upload_vid = make_short()
         # upload the short
         youtube_upload("short", title, upload_vid, None, short_description, short_tags, short_playlist, time)
