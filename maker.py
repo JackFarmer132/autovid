@@ -49,19 +49,19 @@ def make_medium():
         vid_clips.append(clip)
         used_vid_packages.append(clip_package)
 
-    # make segment for 1 hour version on weekend
-    random.shuffle(vid_clips)
-    # make segment clip for the hour long vid
-    segment_vid = concatenate_videoclips(vid_clips)
-    background_choice = bck_list[0]
-    background_vid = VideoFileClip(background_choice)
-    background_vid = background_vid.set_duration(vid_dur)
-    segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
-    segment_vid.audio = None
-    output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
-    segment_vid.write_videofile(output_path, threads=12)
-    del segment_vid
-    gc.collect()
+    # # make segment for 1 hour version on weekend
+    # random.shuffle(vid_clips)
+    # # make segment clip for the hour long vid
+    # segment_vid = concatenate_videoclips(vid_clips)
+    # background_choice = bck_list[0]
+    # background_vid = VideoFileClip(background_choice)
+    # background_vid = background_vid.set_duration(vid_dur)
+    # segment_vid = CompositeVideoClip([background_vid, segment_vid.set_position("center")])
+    # segment_vid.audio = None
+    # output_path = os.path.join(HOUR_SEGMENTS, "segment_" + str(datetime.datetime.today().weekday()) + ".mp4")
+    # segment_vid.write_videofile(output_path, threads=12)
+    # del segment_vid
+    # gc.collect()
 
     # make actual video
     random.shuffle(vid_clips)
@@ -107,6 +107,10 @@ def make_medium():
 
     # if new food, get rid of used clips and replace with new ones, else just append
     vid_list = update_clips(used_vid_packages, vid_list)
+
+    # if a week has passed, shuffle to keep fresh
+    if (datetime.datetime.today().weekday() == 6):
+        random.shuffle(vid_list)
 
     # add audio back to list
     aud_list = update_pickles(used_aud_packages, AUDIO_DIR)
